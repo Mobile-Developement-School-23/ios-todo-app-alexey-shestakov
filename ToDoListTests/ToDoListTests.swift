@@ -18,7 +18,7 @@ class ToDoListTests: XCTestCase {
         
         let todoItem1 = TodoItem.parse(json: json1)
         
-        XCTAssertNotNil(todoItem1, "Failed to parse JSON")
+        XCTAssertNotNil(todoItem1)
         XCTAssertEqual(todoItem1?.id, "123")
         XCTAssertEqual(todoItem1?.text, "Buy groceries")
         XCTAssertEqual(todoItem1?.importance, .important)
@@ -39,7 +39,7 @@ class ToDoListTests: XCTestCase {
         
         let todoItem2 = TodoItem.parse(json: json2)
         
-        XCTAssertNotNil(todoItem2, "Failed to parse JSON")
+        XCTAssertNotNil(todoItem2)
         XCTAssertEqual(todoItem2?.id, "789")
         XCTAssertEqual(todoItem2?.text, "Finish homework")
         XCTAssertEqual(todoItem2?.importance, .normal)
@@ -47,6 +47,19 @@ class ToDoListTests: XCTestCase {
         XCTAssertFalse(todoItem2?.done ?? true)
         XCTAssertEqual(todoItem2?.dateCreation, Date(timeIntervalSince1970: 1668566400))
         XCTAssertEqual(todoItem2?.dateChanging, Date(timeIntervalSince1970: 1668921600))
+        
+        //3
+        let json3: [String: Any] = [
+            "iddddddddd": "789",
+            "text": "Finish homework",
+            "deadline": 1670409600,
+            "done": false,
+            "dateCreation": 1668566400,
+            "dateChanging": 1668921600
+        ]
+        
+        let todoItem3 = TodoItem.parse(json: json3)
+        XCTAssertNil(todoItem3)
     }
     
     func testJSON() {
@@ -62,7 +75,7 @@ class ToDoListTests: XCTestCase {
         )
         let json1 = todoItem1.json as? [String: Any]
         
-        XCTAssertNotNil(json1, "Failed to convert to JSON")
+        XCTAssertNotNil(json1)
         XCTAssertEqual(json1?["id"] as? String, "456")
         XCTAssertEqual(json1?["text"] as? String, "Finish project")
         XCTAssertEqual(json1?["importance"] as? String, nil)
@@ -83,7 +96,7 @@ class ToDoListTests: XCTestCase {
         )
         let json2 = todoItem2.json as? [String: Any]
         
-        XCTAssertNotNil(json2, "Failed to convert to JSON")
+        XCTAssertNotNil(json2)
         XCTAssertEqual(json2?["id"] as? String, "456")
         XCTAssertEqual(json2?["text"] as? String, "Read a book")
         XCTAssertEqual(json2?["importance"] as? String, "важная")
@@ -98,7 +111,7 @@ class ToDoListTests: XCTestCase {
         let csv1 = "789,Study for exam,неважная,1637126400,0,1636281600,"
         let todoItem1 = TodoItem.parse(csv: csv1)
         
-        XCTAssertNotNil(todoItem1, "Failed to parse CSV")
+        XCTAssertNotNil(todoItem1)
         XCTAssertEqual(todoItem1?.id, "789")
         XCTAssertEqual(todoItem1?.text, "Study for exam")
         XCTAssertEqual(todoItem1?.importance, .unimportant)
@@ -111,7 +124,7 @@ class ToDoListTests: XCTestCase {
         let csv2 = "101,Write report,,1673414400,1,1672176000,1672483200"
         let todoItem2 = TodoItem.parse(csv: csv2)
         
-        XCTAssertNotNil(todoItem2, "Failed to parse CSV")
+        XCTAssertNotNil(todoItem2)
         XCTAssertEqual(todoItem2?.id, "101")
         XCTAssertEqual(todoItem2?.text, "Write report")
         XCTAssertEqual(todoItem2?.importance, .normal)
@@ -119,6 +132,12 @@ class ToDoListTests: XCTestCase {
         XCTAssertTrue(todoItem2?.done ?? false)
         XCTAssertEqual(todoItem2?.dateCreation, Date(timeIntervalSince1970: 1672176000))
         XCTAssertEqual(todoItem2?.dateChanging, Date(timeIntervalSince1970: 1672483200))
+        
+        //3
+        let csv3 = "101,Write report,,1673414400,1,1672176000,1672483200,,,,,,,,,"
+        let todoItem3 = TodoItem.parse(csv: csv3)
+        
+        XCTAssertNil(todoItem3)
     }
     
     func testCSV() {
