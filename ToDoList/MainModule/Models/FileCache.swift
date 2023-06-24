@@ -16,7 +16,7 @@ final class FileCache {
     }
     
     //json
-    func saveJson(toFileWithID file: String) throws {
+    func saveToJson(toFileWithID file: String) throws {
         let arrayItems = items.map { $0.value }
         try saveItemsJson(items: arrayItems, to: file)
     }
@@ -29,12 +29,11 @@ final class FileCache {
         
         let path = directory.appendingPathComponent("\(file).json")
         let itemsJson = items.map { $0.json }
-//        print(itemsJson)
         let data = try JSONSerialization.data(withJSONObject: itemsJson, options: [])
         try data.write(to: path, options: .atomic)
     }
     
-    func loadJson(from file: String) throws {
+    func loadFromJson(from file: String) throws {
         self.items = try loadItemsJson(from: file).reduce(into: [:]) { result, item in
             result[item.id] = item
         }
@@ -53,13 +52,12 @@ final class FileCache {
             throw FileCacheErrors.unparsableData
         }
         let todoItems = json.compactMap { TodoItem.parse(json: $0) }
-//        print(todoItems)
         return todoItems
     }
     
     
     //csv
-    func saveCSV(toFileWithID file: String) throws {
+    func saveToCSV(toFileWithID file: String) throws {
         let arrayItems = items.map { $0.value }
         try saveItemsCSV(items: arrayItems, to: file)
     }
@@ -76,12 +74,11 @@ final class FileCache {
         guard let data = csvLines.joined(separator: "\n").data(using: .utf8) else {
             throw FileCacheErrors.UTF8FormatError
         }
-//        print(csvLines, "saveItemsCSV")
         try data.write(to: path, options: .atomic)
     }
     
     
-    func loadCSV(from file: String) throws {
+    func loadFromCSV(from file: String) throws {
         self.items = try loadItemsCSV(from: file).reduce(into: [:]) { result, item in
             result[item.id] = item
         }
@@ -100,8 +97,6 @@ final class FileCache {
             throw FileCacheErrors.UTF8FormatError
         }
         let csvLines = csvString.components(separatedBy: "\n")
-//        print(dataLines, "loadItemsCSV")
-        // Разбираем оставшиеся строки в массив TodoItem
         let todoItems = csvLines.compactMap { TodoItem.parse(csv: $0) }
         return todoItems
     }
