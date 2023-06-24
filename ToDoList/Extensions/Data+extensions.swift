@@ -11,4 +11,15 @@ extension Date {
         return localDate
     }
     
+    func stringFromDate() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMMM yyyy"
+        formatter.locale = Locale(identifier: "ru_RU")
+        return formatter.string(from: self)
+    }
+    
+    func offsetDays(days: Int) -> Date {
+        let offsetDays = Calendar.current.date(byAdding: .day, value: days, to: self) ?? Date()
+        return offsetDays
+    }
 }
