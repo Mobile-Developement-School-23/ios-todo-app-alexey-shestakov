@@ -252,7 +252,6 @@
 			isa = PBXGroup;
 			children = (
 				C54C2B112A40766700D30949 /* Protocols */,
-				C54C2B142A40769800D30949 /* Model */,
 				C54C2B122A40768600D30949 /* View */,
 				C54C2B132A40768C00D30949 /* ViewModel */,
 			);
@@ -301,13 +300,6 @@
 				C54C2B0F2A3F7AEC00D30949 /* DetailViewModel.swift */,
 			);
 			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		C54C2B142A40769800D30949 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		C54C2B1A2A40A1EA00D30949 /* SubViews */ = {
