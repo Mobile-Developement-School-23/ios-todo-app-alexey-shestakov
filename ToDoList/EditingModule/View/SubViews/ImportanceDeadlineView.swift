@@ -9,15 +9,12 @@ import UIKit
 
 protocol ImportanceDeadlineViewProtocol: AnyObject {
     var importanceDeadlineViewHeight: NSLayoutConstraint {get set}
-    func showDatePicker(height: CGFloat)
     func hideDatePicker(height: CGFloat)
     func rollScrollViewForDatePicker(height: CGFloat)
 }
 
 class ImportanceDeadlineView: UIView {
     
-    
-    //ПОМЕНяТЬ!!!!
     weak var detailViewControllerDelegate: ImportanceDeadlineViewProtocol?
     
     private let separatorFirst: UIView = {
@@ -50,9 +47,10 @@ class ImportanceDeadlineView: UIView {
         let segmentedControl = UISegmentedControl(items: [arrowSegment, noSegment, important])
         segmentedControl.tintColor = .red
         segmentedControl.selectedSegmentIndex = 1
-        segmentedControl.selectedSegmentTintColor = .black
+        segmentedControl.selectedSegmentTintColor = .systemBlue
         segmentedControl.setTitleTextAttributes([ .foregroundColor: UIColor.black], for: .normal)
         segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+        segmentedControl.addTarget(self, action: #selector(segmentedControlValueChanged), for: .valueChanged)
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
         return segmentedControl
     }()
@@ -70,12 +68,14 @@ class ImportanceDeadlineView: UIView {
         button.setTitle(dateString, for: .normal)
         button.addTarget(self, action: #selector(showDatePicker), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.isHidden = true
         return button
     }()
 
     private lazy var deadlineSwitch: UISwitch = {
         let deadlineSwitch = UISwitch()
         deadlineSwitch.isOn = false
+        deadlineSwitch.onTintColor = .systemBlue
         deadlineSwitch.addTarget(self, action: #selector(switchValueDidChange(_:)), for: .valueChanged)
         deadlineSwitch.translatesAutoresizingMaskIntoConstraints = false
         return deadlineSwitch
@@ -125,6 +125,8 @@ class ImportanceDeadlineView: UIView {
         backgroundColor = .white
         translatesAutoresizingMaskIntoConstraints = false
         layer.cornerRadius = 16
+        
+        deadlineButton.setTitle(datePicker.date.stringFromDate(), for: .normal)
 
         stackUpper = UIStackView(arrangedSubviews: [importanceLabel, segmentedControl],
                                  axis: .horizontal,
@@ -157,7 +159,12 @@ class ImportanceDeadlineView: UIView {
         addSubview(datePickerSeparatorStack)
     }
     
+    @objc func segmentedControlValueChanged() {
+        NotificationCenter.default.post(name: .editingStarted, object: nil)
+    }
+    
     @objc func switchValueDidChange(_ sender: UISwitch!) {
+        NotificationCenter.default.post(name: .editingStarted, object: nil)
         if (sender.isOn){
             deadlineButton.isHidden = false
             deadlineButton.isEnabled = true
@@ -180,11 +187,11 @@ class ImportanceDeadlineView: UIView {
             self.datePicker.isHidden = false
             self.separatorSecond.isHidden = false
         }
-        detailViewControllerDelegate?.showDatePicker(height: datePickerSeparatorStack.frame.height)
         detailViewControllerDelegate?.rollScrollViewForDatePicker(height: datePickerSeparatorStack.frame.height)
     }
     
     @objc private func datePickerValueChanged() {
+        NotificationCenter.default.post(name: .editingStarted, object: nil)
         deadlineButton.setTitle(datePicker.date.stringFromDate(), for: .normal)
     }
     
@@ -206,9 +213,14 @@ class ImportanceDeadlineView: UIView {
             deadlineButton.isHidden = false
             datePicker.setDate(deadLine, animated: true)
         }
-        
     }
     
+    func getDeadlineDate() -> Date? {
+        if deadlineSwitch.isOn {
+            return datePicker.date
+        }
+        return nil
+    }
 }
 
 
@@ -231,6 +243,7 @@ extension ImportanceDeadlineView {
             datePickerSeparatorStack.topAnchor.constraint(equalTo: superStack.bottomAnchor, constant: 15),
             datePickerSeparatorStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 15),
             datePickerSeparatorStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
+            datePickerSeparatorStack.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 }

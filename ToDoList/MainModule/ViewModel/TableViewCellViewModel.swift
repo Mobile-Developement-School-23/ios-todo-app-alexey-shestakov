@@ -7,20 +7,49 @@
 
 import Foundation
 
-// Эта модель создается когда в нее передают profile - поэтому это будет ее свойство и инициализатор
-
-// Что мы ждем от этой модели? Мы от нее ждем данные, с помощью которых мы сможем заполнить ячейку (age и fullname).
-// Эта модель должна ПОДГОТОВИТЬ fullname, age
-
 class TableViewCellViewModel: TableViewCellViewType {
+    private let dataBase: DataBase
     
-    private var todoItem: TodoItem
-    
+    private let index: Int
+     
     var task: String {
-        return todoItem.text
+        return dataBase.toDoList[index].text
     }
     
-    init(todoItem: TodoItem) {
-        self.todoItem = todoItem
+    var importance: Importance {
+        return dataBase.toDoList[index].importance
+    }
+    
+    var deadline: String? {
+        guard let deadline = dataBase.toDoList[index].deadline?.stringFromDateShort() else {return nil}
+        return deadline
+    }
+    
+    var done: Bool {
+        return dataBase.toDoList[index].done
+    }
+    
+    init(dataBase: DataBase, index: Int) {
+        self.dataBase = dataBase
+        self.index = index
+    }
+    
+    func makeDoneUndone() {
+        let todoItem = TodoItem(id: dataBase.toDoList[index].id,
+                                text: dataBase.toDoList[index].text,
+                                importance: dataBase.toDoList[index].importance,
+                                deadline: dataBase.toDoList[index].deadline,
+                                done: !dataBase.toDoList[index].done,
+                                dateCreation: dataBase.toDoList[index].dateCreation,
+                                dateChanging: Date().localDate())
+        dataBase.toDoList[index] = todoItem
+        dataBase.saveTask(item: todoItem)
+        dataBase.filterArray()
+    }
+    
+    func deleteItem(index: Int) {
+        let todoItem = dataBase.toDoList[index]
+        dataBase.toDoList.remove(at: index)
+        dataBase.removeTask(id: todoItem.id)
     }
 }

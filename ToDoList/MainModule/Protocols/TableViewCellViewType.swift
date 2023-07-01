@@ -9,4 +9,9 @@ import Foundation
 
 protocol TableViewCellViewType: AnyObject {
     var task: String {get}
+    var importance: Importance {get}
+    var done: Bool {get}
+    var deadline: String? {get}
+    func deleteItem(index: Int)
+    func makeDoneUndone()
 }

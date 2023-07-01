@@ -18,7 +18,6 @@ class DetailViewModel: DetailViewModelType {
     }
     
     init(dataBase: DataBase, index: Int?) {
-        print(dataBase.toDoList[index!])
         self.dataBase = dataBase
         self.index = index
     }
@@ -53,28 +52,48 @@ class DetailViewModel: DetailViewModelType {
         return dataBase.toDoList[index].dateCreation
     }
     
-    var dateChanging: Date? {
-        guard let index else {return nil}
-        return dataBase.toDoList[index].dateChanging
-    }
     
-    
-    func saveItemToDataBase(text: String, importanceSegment: Int, deadline: Date?) {
+    func saveChangesItemToDataBase(text: String, importanceSegment: Int, deadline: Date?) {
         var importance: Importance = .normal
         switch importanceSegment {
         case 0: importance = .unimportant
-        case 1: importance = .normal
         case 2: importance = .important
         default:
             break
         }
-        guard let id else {return}
-        let toDoItem = TodoItem(id: id,text: text, importance: importance, deadline: deadline, dateCreation: Date().localDate())
+        guard let id, let dateCreation, let index else {return}
+        let toDoItem = TodoItem(id: id,
+                                text: text,
+                                importance: importance,
+                                deadline: deadline,
+                                dateCreation: dateCreation,
+                                dateChanging: Date().localDate())
+        dataBase.toDoList[index] = toDoItem
         dataBase.saveTask(item: toDoItem)
+        dataBase.filterArray()
+    }
+    
+    func saveNewItemToDataBase(text: String, importanceSegment: Int, deadline: Date?) {
+        var importance: Importance = .normal
+        switch importanceSegment {
+        case 0: importance = .unimportant
+        case 2: importance = .important
+        default:
+            break
+        }
+        let toDoItem = TodoItem(text: text,
+                                importance: importance,
+                                deadline: deadline,
+                                dateCreation: Date().localDate())
+        dataBase.toDoList.append(toDoItem)
+        dataBase.saveTask(item: toDoItem)
+        dataBase.filterArray()
     }
     
     func removeFromDB() {
-        guard let id else {return}
+        guard let id, let index else {return}
+        dataBase.toDoList.remove(at: index)
         dataBase.removeTask(id: id)
+        dataBase.filterArray()
     }
 }

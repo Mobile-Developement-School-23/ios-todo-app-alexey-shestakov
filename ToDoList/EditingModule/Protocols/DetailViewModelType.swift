@@ -22,9 +22,9 @@ protocol DetailViewModelType: AnyObject {
     
     var dateCreation: Date? {get}
     
-    var dateChanging: Date? {get}
+    func saveChangesItemToDataBase(text: String, importanceSegment: Int, deadline: Date?)
     
-    func saveItemToDataBase(text: String, importanceSegment: Int, deadline: Date?)
+    func saveNewItemToDataBase(text: String, importanceSegment: Int, deadline: Date?)
     
     func removeFromDB()
 }

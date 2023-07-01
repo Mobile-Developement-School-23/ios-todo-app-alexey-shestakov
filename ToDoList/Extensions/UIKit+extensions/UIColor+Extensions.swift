@@ -10,4 +10,5 @@ import UIKit
 extension UIColor {
     static let specialBackground = #colorLiteral(red: 0.975140512, green: 0.9716036916, blue: 0.9593529105, alpha: 1)
     static let specialGray = #colorLiteral(red: 0.3176470588, green: 0.3176470588, blue: 0.3137254902, alpha: 1)
+    static let customLightGray = #colorLiteral(red: 0.9058823529, green: 0.968627451, blue: 0.9843137255, alpha: 1)
 }
