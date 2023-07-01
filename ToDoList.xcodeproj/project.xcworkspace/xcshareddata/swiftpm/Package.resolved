@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "filecahelibrary",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alexey-shestakov/FileCaheLibrary.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "769b3c2bba1d1ce182a1f570987dc00d73bc3290"
+      }
+    },
+    {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
