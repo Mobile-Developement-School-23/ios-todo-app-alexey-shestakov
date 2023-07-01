@@ -17,6 +17,7 @@
 		C51CA1542A4FD2AC008F2C63 /* CocoaLumberjack in Frameworks */ = {isa = PBXBuildFile; productRef = C51CA1532A4FD2AC008F2C63 /* CocoaLumberjack */; };
 		C51CA1562A4FD2AC008F2C63 /* CocoaLumberjackSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C51CA1552A4FD2AC008F2C63 /* CocoaLumberjackSwift */; };
 		C51CA1582A4FD2AC008F2C63 /* CocoaLumberjackSwiftLogBackend in Frameworks */ = {isa = PBXBuildFile; productRef = C51CA1572A4FD2AC008F2C63 /* CocoaLumberjackSwiftLogBackend */; };
+		C51CA15C2A4FD958008F2C63 /* FileCacheLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = C51CA15B2A4FD958008F2C63 /* FileCacheLibrary */; };
 		C54AFC5C2A3D160F00FFD18E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54AFC5B2A3D160F00FFD18E /* AppDelegate.swift */; };
 		C54AFC5E2A3D160F00FFD18E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54AFC5D2A3D160F00FFD18E /* SceneDelegate.swift */; };
 		C54AFC602A3D160F00FFD18E /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54AFC5F2A3D160F00FFD18E /* MainViewController.swift */; };
@@ -109,6 +110,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C51CA15C2A4FD958008F2C63 /* FileCacheLibrary in Frameworks */,
 				C51CA1562A4FD2AC008F2C63 /* CocoaLumberjackSwift in Frameworks */,
 				C51CA1582A4FD2AC008F2C63 /* CocoaLumberjackSwiftLogBackend in Frameworks */,
 				C51CA1542A4FD2AC008F2C63 /* CocoaLumberjack in Frameworks */,
@@ -380,6 +382,7 @@
 				C51CA1532A4FD2AC008F2C63 /* CocoaLumberjack */,
 				C51CA1552A4FD2AC008F2C63 /* CocoaLumberjackSwift */,
 				C51CA1572A4FD2AC008F2C63 /* CocoaLumberjackSwiftLogBackend */,
+				C51CA15B2A4FD958008F2C63 /* FileCacheLibrary */,
 			);
 			productName = ToDoList;
 			productReference = C54AFC582A3D160F00FFD18E /* ToDoList.app */;
@@ -457,6 +460,7 @@
 			mainGroup = C54AFC4F2A3D160F00FFD18E;
 			packageReferences = (
 				C51CA1522A4FD2AC008F2C63 /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
+				C51CA15A2A4FD958008F2C63 /* XCRemoteSwiftPackageReference "FileCaheLibrary" */,
 			);
 			productRefGroup = C54AFC592A3D160F00FFD18E /* Products */;
 			projectDirPath = "";
@@ -956,6 +960,14 @@
 				minimumVersion = 3.8.0;
 			};
 		};
+		C51CA15A2A4FD958008F2C63 /* XCRemoteSwiftPackageReference "FileCaheLibrary" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alexey-shestakov/FileCaheLibrary.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -973,6 +985,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C51CA1522A4FD2AC008F2C63 /* XCRemoteSwiftPackageReference "CocoaLumberjack" */;
 			productName = CocoaLumberjackSwiftLogBackend;
+		};
+		C51CA15B2A4FD958008F2C63 /* FileCacheLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C51CA15A2A4FD958008F2C63 /* XCRemoteSwiftPackageReference "FileCaheLibrary" */;
+			productName = FileCacheLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
