@@ -18,7 +18,7 @@ class DetailViewController: UIViewController, ExtandingTextViewProtocol {
     let navigtionBar: UINavigationBar = {
         let nav = UINavigationBar()
         nav.translatesAutoresizingMaskIntoConstraints = false
-        nav.backgroundColor = .white
+        nav.backgroundColor = .specialBackground
         return nav
     }()
     
@@ -68,8 +68,8 @@ class DetailViewController: UIViewController, ExtandingTextViewProtocol {
         self.viewModel = viewModel
     }
     
-    override func loadView() {
-        super.loadView()
+    override func viewDidLoad() {
+        super.viewDidLoad()
 
         view.backgroundColor = .red
         setUpDelegates()
@@ -81,12 +81,16 @@ class DetailViewController: UIViewController, ExtandingTextViewProtocol {
         addGesture()
         
         configure()
-
+        layoutForTransition()
     }
     override func viewWillAppear(_: Bool) {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(keyboardWillShow(notification: )),
                                                name: UIResponder.keyboardWillShowNotification,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillHide(notification: )),
+                                               name: UIResponder.keyboardWillHideNotification,
                                                object: nil)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(makeSavingEnable),
@@ -100,8 +104,42 @@ class DetailViewController: UIViewController, ExtandingTextViewProtocol {
 
     override func viewDidDisappear(_: Bool) {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: .editingStarted, object: nil)
         NotificationCenter.default.removeObserver(self, name: .hasNoText, object: nil)
+    }
+    
+    
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        layoutForTransition()
+        if keyBoardHeight != 0 {
+            
+        }
+    }
+    
+    @discardableResult
+    func layoutForTransition() -> UIDeviceOrientation {
+        let orientation = UIDevice.current.orientation
+        
+        switch orientation {
+        case .portrait:
+            importanceDeadlineView.isHidden = false
+            deleteButton.isHidden = false
+        case .portraitUpsideDown:
+            importanceDeadlineView.isHidden = false
+            deleteButton.isHidden = false
+        case .landscapeLeft:
+            importanceDeadlineView.isHidden = true
+            deleteButton.isHidden = true
+        case .landscapeRight:
+            importanceDeadlineView.isHidden = true
+            deleteButton.isHidden = true
+        default:
+            break
+        }
+        return orientation
     }
     
     private func setUpViews() {
@@ -129,7 +167,16 @@ class DetailViewController: UIViewController, ExtandingTextViewProtocol {
     }
     
     @objc private func saveButtonTapped() {
-        viewModel?.saveItemToDataBase(text: textView.text, importanceSegment: importanceDeadlineView.segmentedControl.selectedSegmentIndex, deadline: importanceDeadlineView.datePicker.date)
+        if viewModel?.getIndex() != nil {
+            viewModel?.saveChangesItemToDataBase(text: textView.text, importanceSegment: importanceDeadlineView.segmentedControl.selectedSegmentIndex, deadline: importanceDeadlineView.getDeadlineDate())
+            NotificationCenter.default.post(name: .reloadData, object: nil)
+        } else {
+            viewModel?.saveNewItemToDataBase(text: textView.text,
+                                             importanceSegment: importanceDeadlineView.segmentedControl.selectedSegmentIndex,
+                                             deadline: importanceDeadlineView.getDeadlineDate())
+            NotificationCenter.default.post(name: .reloadData, object: nil)
+        }
+        dismiss(animated: true)
     }
     
     @objc private func cancelButtonTapped() {
@@ -138,11 +185,15 @@ class DetailViewController: UIViewController, ExtandingTextViewProtocol {
     
     @objc private func deleteButtonTapped() {
         viewModel?.removeFromDB()
+        NotificationCenter.default.post(name: .reloadData, object: nil)
+        dismiss(animated: true)
     }
     
     @objc private func makeSavingEnable() {
-        navigtionBar.topItem?.rightBarButtonItem?.isEnabled = true
-        navigtionBar.topItem?.rightBarButtonItem?.tintColor = .systemBlue
+        if !textView.text.isEmpty {
+            navigtionBar.topItem?.rightBarButtonItem?.isEnabled = true
+            navigtionBar.topItem?.rightBarButtonItem?.tintColor = .systemBlue
+        }
     }
     
     @objc private func makeSavingInEnable() {
@@ -154,23 +205,14 @@ class DetailViewController: UIViewController, ExtandingTextViewProtocol {
 
 extension DetailViewController: ImportanceDeadlineViewProtocol {
     
-    func showDatePicker(height: CGFloat) {
-        importanceDeadlineViewHeight.constant = importanceDeadlineViewHeight.constant + height
-        UIView.animate(withDuration: 0.5) {
-            self.view.layoutIfNeeded()
-        }
-    }
-    
     func hideDatePicker(height: CGFloat) {
         importanceDeadlineViewHeight.constant = 140
         UIView.animate(withDuration: 0.5) {
             self.view.layoutIfNeeded()
         }
-        print(importanceDeadlineViewHeight.constant)
     }
     
     func rollScrollViewForDatePicker(height: CGFloat) {
-        print(importanceDeadlineView.frame.maxY, view.frame.maxY)
         if importanceDeadlineView.frame.maxY > view.frame.maxY {
             UIView.animate(withDuration: 0.5) {
                 self.scrollView.contentOffset = CGPoint(x: 0, y: self.scrollView.contentOffset.y + height)
@@ -202,7 +244,12 @@ extension DetailViewController {
     @objc func keyboardWillShow(notification: NSNotification) {
         guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
         keyBoardHeight = keyboardSize.height
+        textView.getCoursorY(textView: textView)
         rollScrollViewForTextView(coursorDist: coursorDistanceFromBottom)
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        keyBoardHeight = 0
     }
     
     func rollScrollViewForTextView(coursorDist: CGFloat) {
@@ -245,13 +292,13 @@ extension DetailViewController {
 extension DetailViewController {
     private func setUpConstraints() {
         
-        importanceDeadlineViewHeight = importanceDeadlineView.heightAnchor.constraint(equalToConstant: 140)
+        importanceDeadlineViewHeight = importanceDeadlineView.heightAnchor.constraint(greaterThanOrEqualToConstant: 140)
         importanceDeadlineViewHeight.isActive = true
         
         NSLayoutConstraint.activate([
             scrollView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             scrollView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.bottomAnchor.constraint(equalTo:  view.keyboardLayoutGuide.topAnchor),
             
             contentView.centerXAnchor.constraint(equalTo: view.centerXAnchor),

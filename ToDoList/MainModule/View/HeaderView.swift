@@ -8,49 +8,111 @@ import UIKit
 
 class HeaderView: UIView {
     
+    var mainViewModel: TableViewViewModelType?
+    
     weak var tableViewDelegate: TableView?
     
     lazy var button: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Свернуть", for: .normal)
+        button.setTitle("\(SortedBy.onlyNotDone.rawValue)", for: .normal)
+        button.layer.cornerRadius = 15
+        button.contentHorizontalAlignment = .right
+        button.backgroundColor = .clear
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         return button
+    }()
+    
+    let label: UILabel = {
+        let label = UILabel()
+        label.textColor = .lightGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setUpViews()
         setupConstraints()
+        
+        let contextMenuInteraction = UIContextMenuInteraction(delegate: self)
+        button.addInteraction(contextMenuInteraction)
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        setUpViews()
-        setupConstraints()
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func setUpViews() {
-        self.addSubview(button)
+        backgroundColor = .specialBackground
+        addSubview(button)
+        addSubview(label)
     }
+    
+    public func configure() {
+        guard let number = mainViewModel?.returnModel().countDone() else {return}
+        label.text = "Выполнено - \(number)"
+        
+        mainViewModel?.numberDoneTasks.bind(listener: { [unowned self] number in
+            guard let number else {return}
+            label.text = "Выполнено - \(number)"
+        })
+    }
+    
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            button.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            label.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
+            label.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
+            label.widthAnchor.constraint(equalToConstant: 200),
+            label.heightAnchor.constraint(equalToConstant: 30),
+            
+            button.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16),
             button.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
-            button.widthAnchor.constraint(equalToConstant: 100),
+            button.widthAnchor.constraint(lessThanOrEqualToConstant: 200),
             button.heightAnchor.constraint(equalToConstant: 30)
         ])
     }
     
+    private(set) var wasSorted = false
+    
     @objc private func buttonTapped() {
-        guard let tableViewDelegate else { return }
-        tableViewDelegate.isExpanded ? button.setTitle("Развернуть", for: .normal) : button.setTitle("Свернуть", for: .normal)
-        tableViewDelegate.isExpanded = !tableViewDelegate.isExpanded
-        UIView.animate(withDuration: 0.4) {
-            tableViewDelegate.reloadSections(IndexSet(integer: 0), with: .fade)
+        guard let tableViewDelegate,
+              let mainViewModel else { return }
+        if !wasSorted {
+            mainViewModel.sortItems(typeSorting: .onlyNotDone)
+            button.setTitle(SortedBy.none.rawValue, for: .normal)
+            wasSorted = true
+        } else {
+            mainViewModel.sortItems(typeSorting: .none)
+            button.setTitle(SortedBy.onlyNotDone.rawValue, for: .normal)
+            wasSorted = false
         }
+        tableViewDelegate.reloadData()
     }
-
 }
 
+extension HeaderView: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        guard let tableViewDelegate, wasSorted else { return nil}
+            let menuActions = [
+                UIAction(title: NSLocalizedString("Оставить только важные", comment: ""),
+                         image: UIImage(named: "Important"))
+                { action in
+                    self.mainViewModel?.sortItems(typeSorting: .onlyImportantAndNotDone)
+                    tableViewDelegate.reloadData()
+                },
+                UIAction(title: NSLocalizedString("Отменить доп фильтрацию", comment: ""),
+                         image: UIImage(systemName: "clear"), attributes: .destructive)
+                { action in
+                    self.mainViewModel?.sortItems(typeSorting: .onlyNotDone)
+                    tableViewDelegate.reloadData()
+                }
+            ]
+            let menu = UIMenu(title: "Дополнительная фильтрация для несделанных задач", children: menuActions)
+            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { _ in
+                return menu
+            })
+        }
+}

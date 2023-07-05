@@ -10,4 +10,5 @@ import Foundation
 extension Notification.Name {
     static let editingStarted = Notification.Name("Editing Started")
     static let hasNoText = Notification.Name("No text")
+    static let reloadData = Notification.Name("reloadData")
 }

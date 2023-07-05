@@ -22,7 +22,6 @@ class ExtandingTextView: UITextView {
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: .none)
         configure()
-        setText(text: "")
     }
     
     required init?(coder: NSCoder) {
@@ -32,6 +31,7 @@ class ExtandingTextView: UITextView {
     private func configure() {
         font = .systemFont(ofSize: 17)
         textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+        backgroundColor = .tertiarySystemBackground
         layer.cornerRadius = 16
         clipsToBounds = true
         translatesAutoresizingMaskIntoConstraints = false
@@ -40,10 +40,6 @@ class ExtandingTextView: UITextView {
         isScrollEnabled = false
         sizeToFit()
         delegate = self
-    }
-    
-    public func setText(text: String) {
-        self.text = "Фint(x: 0, y: rollY), animated: true)            scrollView.setContentOffset(CGPoint(x: 0, y: rollY), animated: true)            scrollView.setContentOffset(CGPoi        "
     }
 }
 
@@ -68,7 +64,6 @@ extension ExtandingTextView: UITextViewDelegate {
         getCoursorY(textView: textView)
         viewControllerDelegate.rollScrollViewForTextView(coursorDist: viewControllerDelegate.coursorDistanceFromBottom)
     }
-    
     
     func getCoursorY(textView: UITextView) {
         guard let selectedRange = textView.selectedTextRange else {return}

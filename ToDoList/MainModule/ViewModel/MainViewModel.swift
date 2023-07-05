@@ -9,21 +9,53 @@ import Foundation
 
 class MainViewModel: TableViewViewModelType {
     
-    var model = DataBase()
+    private let model: DataBase
+    
+    
+    init(model: DataBase = DataBase()) {
+        self.model = model
+        model.mainViewModelDelegate = self
+    }
+    
+    func returnModel() -> DataBase {
+        return model
+    }
+    
+    var numberDoneTasks: Observable<Int?> = Observable(nil)
     
     func numberOfRows() -> Int {
         return model.toDoList.count
     }
-    
-    // задача нашей вьюмодели просто передать этот профиль дальше, чтобы следующая вьюмодель с ним работала
-    // TableViewCellViewModel - следующая вьюмодель для заполнения ячейки а не всей таблицы
+
     func cellViewModel(forIndexPath indexPath: IndexPath) -> TableViewCellViewType? {
-        let todoItem = model.toDoList[indexPath.row]
-        return TableViewCellViewModel(todoItem: todoItem)
+        return TableViewCellViewModel(dataBase: model, index: indexPath.row)
     }
     
-    // будет создавать вьюМодель для экрана с детализированной информацией
     func viewModelForSelectedRow(forIndexPath indexPath: IndexPath) -> DetailViewModelType? {
         return DetailViewModel(dataBase: model, index: indexPath.row)
+    }
+    
+    func deleteItem(index: Int) {
+        let todoItem = model.toDoList[index]
+        model.toDoList.remove(at: index)
+        model.removeTask(id: todoItem.id)
+    }
+    
+    func sortItems(typeSorting: SortedBy) {
+        switch typeSorting {
+        case .onlyImportant:
+            model.isFiltered = true
+            model.typeSorting = .onlyImportant
+        case .onlyNotDone:
+            model.isFiltered = true
+            model.typeSorting = .onlyNotDone
+        case .none:
+            model.isFiltered = false
+            model.typeSorting = .none
+        case .onlyImportantAndNotDone:
+            model.isFiltered = true
+            model.typeSorting = .onlyImportantAndNotDone
+        }
+        model.filterArray()
     }
 }

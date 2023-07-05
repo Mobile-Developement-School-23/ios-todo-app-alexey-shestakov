@@ -10,7 +10,10 @@
 		C51CA1222A44B130008F2C63 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1212A44B130008F2C63 /* UIColor+Extensions.swift */; };
 		C51CA1242A44BA52008F2C63 /* ImportanceDeadlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1232A44BA52008F2C63 /* ImportanceDeadlineView.swift */; };
 		C51CA1262A44C92E008F2C63 /* UIStackView+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1252A44C92E008F2C63 /* UIStackView+extensions.swift */; };
-		C51CA1282A45C07B008F2C63 /* UIViewController+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1272A45C07B008F2C63 /* UIViewController+extensions.swift */; };
+		C51CA1352A4B5A35008F2C63 /* UIView+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1342A4B5A35008F2C63 /* UIView+extensions.swift */; };
+		C51CA13F2A4D02E9008F2C63 /* FooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA13E2A4D02E9008F2C63 /* FooterView.swift */; };
+		C51CA1412A4E5A57008F2C63 /* Observable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1402A4E5A57008F2C63 /* Observable.swift */; };
+		C51CA1442A4E69C2008F2C63 /* TransitonAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1432A4E69C2008F2C63 /* TransitonAnimator.swift */; };
 		C54AFC5C2A3D160F00FFD18E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54AFC5B2A3D160F00FFD18E /* AppDelegate.swift */; };
 		C54AFC5E2A3D160F00FFD18E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54AFC5D2A3D160F00FFD18E /* SceneDelegate.swift */; };
 		C54AFC602A3D160F00FFD18E /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54AFC5F2A3D160F00FFD18E /* MainViewController.swift */; };
@@ -58,7 +61,10 @@
 		C51CA1212A44B130008F2C63 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		C51CA1232A44BA52008F2C63 /* ImportanceDeadlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportanceDeadlineView.swift; sourceTree = "<group>"; };
 		C51CA1252A44C92E008F2C63 /* UIStackView+extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+extensions.swift"; sourceTree = "<group>"; };
-		C51CA1272A45C07B008F2C63 /* UIViewController+extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+extensions.swift"; sourceTree = "<group>"; };
+		C51CA1342A4B5A35008F2C63 /* UIView+extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+extensions.swift"; sourceTree = "<group>"; };
+		C51CA13E2A4D02E9008F2C63 /* FooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterView.swift; sourceTree = "<group>"; };
+		C51CA1402A4E5A57008F2C63 /* Observable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Observable.swift; sourceTree = "<group>"; };
+		C51CA1432A4E69C2008F2C63 /* TransitonAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitonAnimator.swift; sourceTree = "<group>"; };
 		C54AFC582A3D160F00FFD18E /* ToDoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C54AFC5B2A3D160F00FFD18E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C54AFC5D2A3D160F00FFD18E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -114,6 +120,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C51CA1422A4E69AC008F2C63 /* Animators */ = {
+			isa = PBXGroup;
+			children = (
+				C51CA1432A4E69C2008F2C63 /* TransitonAnimator.swift */,
+			);
+			path = Animators;
+			sourceTree = "<group>";
+		};
 		C54AFC4F2A3D160F00FFD18E = {
 			isa = PBXGroup;
 			children = (
@@ -140,6 +154,7 @@
 				C54AFC8D2A3D164600FFD18E /* Application */,
 				C54AFC8C2A3D163500FFD18E /* MainModule */,
 				C54C2AF32A3F1C3000D30949 /* EditingModule */,
+				C51CA1422A4E69AC008F2C63 /* Animators */,
 				C54AFC902A3D167000FFD18E /* Extensions */,
 				C54AFC8B2A3D162000FFD18E /* Resources */,
 			);
@@ -219,6 +234,7 @@
 				C54C2AF22A3F1C1900D30949 /* Cell */,
 				C54C2AF82A3F289200D30949 /* HeaderView.swift */,
 				C54C2AF42A3F1C6A00D30949 /* TableView.swift */,
+				C51CA13E2A4D02E9008F2C63 /* FooterView.swift */,
 				C54AFC5F2A3D160F00FFD18E /* MainViewController.swift */,
 			);
 			path = View;
@@ -236,7 +252,6 @@
 			isa = PBXGroup;
 			children = (
 				C54C2B112A40766700D30949 /* Protocols */,
-				C54C2B142A40769800D30949 /* Model */,
 				C54C2B122A40768600D30949 /* View */,
 				C54C2B132A40768C00D30949 /* ViewModel */,
 			);
@@ -255,6 +270,7 @@
 		C54C2B052A3F767900D30949 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				C51CA1402A4E5A57008F2C63 /* Observable.swift */,
 				C54C2B0B2A3F7A5D00D30949 /* MainViewModel.swift */,
 				C54C2B0D2A3F7ADD00D30949 /* TableViewCellViewModel.swift */,
 			);
@@ -286,13 +302,6 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		C54C2B142A40769800D30949 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		C54C2B1A2A40A1EA00D30949 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -307,7 +316,7 @@
 			children = (
 				C51CA1212A44B130008F2C63 /* UIColor+Extensions.swift */,
 				C51CA1252A44C92E008F2C63 /* UIStackView+extensions.swift */,
-				C51CA1272A45C07B008F2C63 /* UIViewController+extensions.swift */,
+				C51CA1342A4B5A35008F2C63 /* UIView+extensions.swift */,
 			);
 			path = "UIKit+extensions";
 			sourceTree = "<group>";
@@ -442,19 +451,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C51CA1412A4E5A57008F2C63 /* Observable.swift in Sources */,
 				C54C2B102A3F7AEC00D30949 /* DetailViewModel.swift in Sources */,
 				C54AFC602A3D160F00FFD18E /* MainViewController.swift in Sources */,
 				C51CA1262A44C92E008F2C63 /* UIStackView+extensions.swift in Sources */,
 				C54C2AF92A3F289200D30949 /* HeaderView.swift in Sources */,
 				C54C2B002A3F762000D30949 /* TableViewViewModelType.swift in Sources */,
 				C54C2B0A2A3F793A00D30949 /* DataBase.swift in Sources */,
+				C51CA1352A4B5A35008F2C63 /* UIView+extensions.swift in Sources */,
 				C54C2AF72A3F1CA200D30949 /* TableViewCell.swift in Sources */,
 				C54C2B0E2A3F7ADD00D30949 /* TableViewCellViewModel.swift in Sources */,
 				C54AFC5C2A3D160F00FFD18E /* AppDelegate.swift in Sources */,
 				C54C2B192A409D2200D30949 /* DetailViewController.swift in Sources */,
+				C51CA13F2A4D02E9008F2C63 /* FooterView.swift in Sources */,
 				C54AFC5E2A3D160F00FFD18E /* SceneDelegate.swift in Sources */,
 				C54C2AF52A3F1C6A00D30949 /* TableView.swift in Sources */,
-				C51CA1282A45C07B008F2C63 /* UIViewController+extensions.swift in Sources */,
 				C51CA1242A44BA52008F2C63 /* ImportanceDeadlineView.swift in Sources */,
 				C54C2B022A3F762B00D30949 /* TableViewCellViewType.swift in Sources */,
 				C54C2B0C2A3F7A5D00D30949 /* MainViewModel.swift in Sources */,
@@ -463,6 +474,7 @@
 				C54C2B1C2A40A22B00D30949 /* ExtandingTextView.swift in Sources */,
 				C54AFC972A3D16AD00FFD18E /* TodoItem.swift in Sources */,
 				C51CA1222A44B130008F2C63 /* UIColor+Extensions.swift in Sources */,
+				C51CA1442A4E69C2008F2C63 /* TransitonAnimator.swift in Sources */,
 				C54AFC922A3D168200FFD18E /* Data+extensions.swift in Sources */,
 				C54C2B232A41D30100D30949 /* Notification.Name+extension.swift in Sources */,
 			);
