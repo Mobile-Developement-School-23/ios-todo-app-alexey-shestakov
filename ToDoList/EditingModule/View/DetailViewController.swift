@@ -119,8 +119,7 @@ class DetailViewController: UIViewController, ExtandingTextViewProtocol {
         }
     }
     
-    @discardableResult
-    func layoutForTransition() -> UIDeviceOrientation {
+    func layoutForTransition() {
         let orientation = UIDevice.current.orientation
         
         switch orientation {
@@ -139,7 +138,6 @@ class DetailViewController: UIViewController, ExtandingTextViewProtocol {
         default:
             break
         }
-        return orientation
     }
     
     private func setUpViews() {

@@ -69,7 +69,7 @@ class DetailViewModel: DetailViewModelType {
                                 dateCreation: dateCreation,
                                 dateChanging: Date().localDate())
         dataBase.toDoList[index] = toDoItem
-        dataBase.saveTask(item: toDoItem)
+        dataBase.saveTask(item: toDoItem, new: false)
         dataBase.filterArray()
     }
     
@@ -86,14 +86,14 @@ class DetailViewModel: DetailViewModelType {
                                 deadline: deadline,
                                 dateCreation: Date().localDate())
         dataBase.toDoList.append(toDoItem)
-        dataBase.saveTask(item: toDoItem)
+        dataBase.saveTask(item: toDoItem, new: true)
         dataBase.filterArray()
     }
     
     func removeFromDB() {
         guard let id, let index else {return}
+        let todoItem = dataBase.toDoList[index]
         dataBase.toDoList.remove(at: index)
-        dataBase.removeTask(id: id)
-        dataBase.filterArray()
+        dataBase.removeTask(id: id, todoItem: todoItem)
     }
 }

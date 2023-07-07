@@ -43,13 +43,13 @@ class TableViewCellViewModel: TableViewCellViewType {
                                 dateCreation: dataBase.toDoList[index].dateCreation,
                                 dateChanging: Date().localDate())
         dataBase.toDoList[index] = todoItem
-        dataBase.saveTask(item: todoItem)
+        dataBase.saveTask(item: todoItem, new: false)
         dataBase.filterArray()
     }
     
     func deleteItem(index: Int) {
         let todoItem = dataBase.toDoList[index]
         dataBase.toDoList.remove(at: index)
-        dataBase.removeTask(id: todoItem.id)
+        dataBase.removeTask(id: todoItem.id, todoItem: todoItem)
     }
 }

@@ -26,7 +26,6 @@ final class FileCache {
         guard let directory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
             throw FileCacheErrors.noSuchSystemDirectory
         }
-        
         let path = directory.appendingPathComponent("\(file).json")
         let itemsJson = items.map { $0.json }
         let data = try JSONSerialization.data(withJSONObject: itemsJson, options: [])

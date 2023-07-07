@@ -11,17 +11,18 @@ class MainViewModel: TableViewViewModelType {
     
     private let model: DataBase
     
+    var loadFromServer: Observable<Bool> = Observable(false)
     
-    init(model: DataBase = DataBase()) {
-        self.model = model
+    var numberDoneTasks: Observable<Int?> = Observable(nil)
+    
+    init() {
+        self.model = DataBase()
         model.mainViewModelDelegate = self
     }
     
     func returnModel() -> DataBase {
         return model
     }
-    
-    var numberDoneTasks: Observable<Int?> = Observable(nil)
     
     func numberOfRows() -> Int {
         return model.toDoList.count
@@ -35,25 +36,13 @@ class MainViewModel: TableViewViewModelType {
         return DetailViewModel(dataBase: model, index: indexPath.row)
     }
     
-    func deleteItem(index: Int) {
-        let todoItem = model.toDoList[index]
-        model.toDoList.remove(at: index)
-        model.removeTask(id: todoItem.id)
-    }
-    
     func sortItems(typeSorting: SortedBy) {
         switch typeSorting {
-        case .onlyImportant:
-            model.isFiltered = true
-            model.typeSorting = .onlyImportant
         case .onlyNotDone:
-            model.isFiltered = true
             model.typeSorting = .onlyNotDone
         case .none:
-            model.isFiltered = false
             model.typeSorting = .none
         case .onlyImportantAndNotDone:
-            model.isFiltered = true
             model.typeSorting = .onlyImportantAndNotDone
         }
         model.filterArray()

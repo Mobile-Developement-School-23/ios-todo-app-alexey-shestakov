@@ -45,6 +45,18 @@ class TableView: UITableView {
         self.translatesAutoresizingMaskIntoConstraints = false
     }
     
+    ///Эту функцию надо вызвать когда делегат уже установлен
+    public func bindViewModel() {
+        mainViewControllerDelegate?.getViewModel()?.loadFromServer.bind(listener: { [unowned self] bool in
+            if bool {
+                self.reloadData()
+                mainViewControllerDelegate?.processProgressIndicator(false)
+                mainViewControllerDelegate?.getViewModel()?.loadFromServer.value = false
+            }
+        })
+    }
+
+    
     
     lazy var setUpHeader = { [weak self] in
         guard let self, let viewModel = self.mainViewControllerDelegate?.getViewModel() else {return}
@@ -108,10 +120,10 @@ extension TableView: UITableViewDataSource {
     
     ///Функционал оттягивания ячеек
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let cell = tableView.cellForRow(at: indexPath) as? TableViewCell else {return nil}
         ///delete
         let delete = UIContextualAction(style: .destructive, title: "") { _, _, _ in
-            guard let viewModel = self.mainViewControllerDelegate?.getViewModel() else {return}
-            viewModel.deleteItem(index: indexPath.row)
+            cell.viewModel?.deleteItem(index: indexPath.row)
             tableView.reloadData()
         }
         delete.image = UIImage(named: "trash")

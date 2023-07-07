@@ -20,16 +20,29 @@ final class NetworkFetcher: NetworkService {
     private var revision: Int?
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
+    
+    private func getDelay(with retryCount: Int) -> UInt64 {
+        let maxDelay = 120.0
+        let minDelay = 2.0
+        var delay = retryCount == 0 ? minDelay : minDelay * Double(retryCount)
+        let factor = 1.5
+        let jitter = 0.05
+        delay = retryCount == 0 ? minDelay : delay * factor
+        
+        let shift = Double.random(in: -(delay * jitter) ... delay * jitter)
+        print(delay + shift)
+        return UInt64(min(delay + shift, maxDelay) * 1_000_000_000)
+    }
 
     func getAllItems() async throws -> [TodoItem] {
         let url = try RequestProcessor.makeURL()
         let (data, _) = try await RequestProcessor.performRequest(with: url)
         let networkListToDoItems = try decoder.decode(ListToDoItems.self, from: data)
         revision = networkListToDoItems.revision
-//        print(revision)
         return networkListToDoItems.list.map { TodoItem.convert(from: $0) }
     }
     
+    @discardableResult
     func updateItems(toDoItems: [TodoItem]) async throws -> [TodoItem] {
         print("requestUpdateItems")
         let url = try RequestProcessor.makeURL()
@@ -37,7 +50,6 @@ final class NetworkFetcher: NetworkService {
         let httpBody = try encoder.encode(listToDoItems)
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .patch, revision: revision ?? 0, httpBody: httpBody)
         let toDoItemNetwork = try decoder.decode(ListToDoItems.self, from: responseData)
-        print(toDoItemNetwork)
         revision = toDoItemNetwork.revision
         return toDoItemNetwork.list.map{TodoItem.convert(from: $0)}
     }
@@ -70,11 +82,9 @@ final class NetworkFetcher: NetworkService {
     }
     
     func addItem(TodoItem: TodoItem) async throws {
-//        print(revision)
         let elementToDoItem = ElementToDoItem(element: TodoItem.networkItem)
         let url = try RequestProcessor.makeURL()
         let httpBody = try encoder.encode(elementToDoItem)
-//        print(String(data: httpBody, encoding: .utf8))
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .post, revision: revision, httpBody: httpBody)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: responseData)
         revision = toDoItemNetwork.revision

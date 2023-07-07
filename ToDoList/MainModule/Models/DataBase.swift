@@ -9,7 +9,11 @@ import Foundation
 
 class DataBase {
     
-    let cache = FileCache()
+    private let cache = FileCache()
+    private let networkFetcher = NetworkFetcher()
+    
+    private let userDef = UserDefaults.standard
+    private let userDefKey = "isDirty"
     
     var mainViewModelDelegate: MainViewModel?
     
@@ -17,33 +21,73 @@ class DataBase {
     
     var typeSorting: SortedBy = .none
     
-    var isFiltered = false
+    init() {
+        checkDirectoryAndLoad()
+    }
     
     public func filterArray() {
-        tasksExtractor()
-        guard isFiltered else {return}
         switch typeSorting {
         case .onlyImportantAndNotDone:
-            toDoList = toDoList.filter {$0.importance == .important}.filter {$0.done != true}
+            toDoList = Array(self.cache.items.values).filter {$0.importance == .important}.filter {$0.done != true}
         case .onlyNotDone:
-            toDoList = toDoList.filter {$0.done != true}
-        case .onlyImportant:
-            toDoList = toDoList.filter {$0.importance == .important}
+            toDoList = Array(self.cache.items.values).filter {$0.done != true}
         case .none:
-            break
+            toDoList = Array(self.cache.items.values)
+        }
+        toDoList.sort{$0.dateCreation > $1.dateCreation}
+    }
+    
+    private func updateTasks() {
+        print(Thread.current)
+        Task {
+            do {
+                let cachArray = Array(self.cache.items.values)
+                try await networkFetcher.updateItems(toDoItems: cachArray)
+                userDef.set(false, forKey: userDefKey)
+            } catch {
+                print(error)
+            }
         }
     }
     
-    public func saveTask(item: TodoItem) {
+    public func saveTask(item: TodoItem, new: Bool) {
         cache.add(item: item)
         countDone()
         try? self.cache.saveToJson(toFileWithID: fileName)
+        guard userDef.bool(forKey: userDefKey) != true else {
+            updateTasks()
+            return
+        }
+        Task {
+            do {
+                if new {
+                    try await networkFetcher.addItem(TodoItem: item)
+                } else {
+                    try await networkFetcher.changeItem(TodoItem: item)
+                }
+            } catch {
+                userDef.set(true, forKey: userDefKey)
+                print(userDef.bool(forKey: userDefKey), "UserDef")
+            }
+        }
     }
     
-    public func removeTask(id: String) {
+    public func removeTask(id: String, todoItem: TodoItem) {
         cache.remove(id: id)
         countDone()
         try? self.cache.saveToJson(toFileWithID: fileName)
+        guard userDef.bool(forKey: userDefKey) != true else {
+            updateTasks()
+            return
+        }
+        Task {
+            do {
+                try await networkFetcher.removeItem(TodoItem: todoItem)
+            } catch {
+                userDef.set(true, forKey: userDefKey)
+                print(userDef.bool(forKey: userDefKey), "UserDef")
+            }
+        }
     }
     
     @discardableResult
@@ -53,65 +97,40 @@ class DataBase {
         return array.count
     }
     
-    lazy var tasksExtractor = { [weak self] in
-        guard let self else {return}
-        try? self.cache.loadFromJson(from: fileName)
-        self.toDoList = Array(self.cache.items.values)
-        self.toDoList.sort{$0.dateCreation > $1.dateCreation}
-    }
-    
-    
-    
-    
-    
-    //MARK: - Это тестовые данные, чтобы можно было сохранить в дирректорию!!!
-    lazy var tasksSaver = {
-        let cache = FileCache()
-        
-        var tasksToWrite = [
-            TodoItem(id: "1", text: """
-Я помню чудное мгновенье:
-Передо мной явилась ты,
-Как мимолетное виденье,
-Как гений чистой красоты.
-
-В томленьях грусти безнадежной,
-В тревогах шумной суеты,
-Звучал мне долго голос нежный
-И снились милые черты.
-
-Шли годы. Бурь порыв мятежный
-Рассеял прежние мечты,
-И я забыл твой голос нежный,
-Твои небесные черты.
-""",
-                     importance: .important, deadline: Date().localDate().offsetDays(days: 3), done: true, dateCreation: Date().localDate().offsetDays(days: -2)),
-            
-            TodoItem(id: "2", text: "Я помню чудное мгновенье:", importance: .important, deadline: Date().localDate().offsetDays(days: 5), done: false, dateCreation: Date().localDate().offsetDays(days: -6)),
-
-            TodoItem(id: "3", text: "У лукоморья дуб зеленый", importance: .unimportant, deadline: nil, done: true, dateCreation: Date().localDate().offsetDays(days: 0))
-        ]
-        for item in tasksToWrite {
-            self.cache.add(item: item)
+    private func checkDirectoryAndLoad() {
+        /// Если это первый запуск прилы, то создаем дирректорию и получаем данные с сервера
+        let userDefailts = UserDefaults.standard
+        if userDefailts.bool(forKey: "DirectoryExists") == false {
+            try? self.cache.saveToJson(toFileWithID: fileName)
+            userDefailts.set(true, forKey: "DirectoryExists")
         }
-        try? self.cache.saveToJson(toFileWithID: "myTasksJson")
+        Task {
+            await self.loadFromServer()
+            await MainActor.run {
+                try? self.cache.loadFromJson(from: fileName)
+                toDoList = Array(self.cache.items.values)
+                toDoList.sort{$0.dateCreation > $1.dateCreation}
+                mainViewModelDelegate?.loadFromServer.value = true
+                mainViewModelDelegate?.numberDoneTasks.value = countDone()
+            }
+        }
     }
     
-    
-
-    
-    init() {
-        /// Обращаемся к файлам вида json и csv и достаем из них данные, записывая их в toDoList
-        tasksSaver()
-        tasksExtractor()
-        
+    public func loadFromServer() async {
+        do {
+            let networkingList = try await networkFetcher.getAllItems()
+            for toDoItem in networkingList {
+                cache.add(item: toDoItem)
+            }
+            try? cache.saveToJson(toFileWithID: fileName)
+        } catch {
+            userDef.set(true, forKey: userDefKey)
+        }
     }
-    
 }
 
 
 enum SortedBy: String {
-    case onlyImportant = "Важные"
     case onlyNotDone = "Несделанные"
     case none = "Все"
     case onlyImportantAndNotDone = "Важные и несделанные"

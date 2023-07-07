@@ -8,7 +8,7 @@ struct NetworkTodoItem: Codable {
     let changedAt: Int?
     let lastUpdatedBy: String
     
-    init(id: String, text: String, importance: String, deadline: Int? = nil, done: Bool, createdAt: Int, changedAt: Int? = nil, lastUpdatedBy: String = "iphone") {
+    init(id: String, text: String, importance: String, deadline: Int? = nil, done: Bool, createdAt: Int, changedAt: Int? = nil, lastUpdatedBy: String = "me") {
         self.id = id
         self.text = text
         self.importance = importance
