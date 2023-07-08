@@ -10,7 +10,7 @@ import Foundation
 extension URLSession {
     func dataTaskCustom(for request: URLRequest) async throws -> (Data, URLResponse) {
         var dataTask: URLSessionDataTask?
-        let onCancel = { dataTask?.cancel()}
+        let onCancel = { dataTask?.cancel() }
 
         return try await withTaskCancellationHandler(
             handler: {

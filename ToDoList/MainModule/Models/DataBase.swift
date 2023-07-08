@@ -21,6 +21,9 @@ class DataBase {
     
     var typeSorting: SortedBy = .none
     
+    var operationTaskChange: Task<Void, Never>?
+    var operationTaskUpdate: Task<Void, Never>?
+    
     init() {
         checkDirectoryAndLoad()
     }
@@ -38,11 +41,13 @@ class DataBase {
     }
     
     private func updateTasks() {
-        print(Thread.current)
         Task {
             do {
                 let cachArray = Array(self.cache.items.values)
-                try await networkFetcher.updateItems(toDoItems: cachArray)
+                try await networkFetcher.updateItems(toDoItems: cachArray, maxRetryAttempts: numberRetries)
+                await MainActor.run {
+                    mainViewModelDelegate?.loadFromServer.value = true
+                }
                 userDef.set(false, forKey: userDefKey)
             } catch {
                 print(error)
@@ -58,18 +63,23 @@ class DataBase {
             updateTasks()
             return
         }
-        Task {
+        if let operationTaskChange,
+           !operationTaskChange.isCancelled {
+            operationTaskChange.cancel()
+        }
+        let currentTask = Task {
             do {
                 if new {
-                    try await networkFetcher.addItem(TodoItem: item)
+                    try await networkFetcher.addItem(toDoItems: item, maxRetryAttempts: numberRetries)
                 } else {
-                    try await networkFetcher.changeItem(TodoItem: item)
+                    try await networkFetcher.changeItem(toDoItems: item, maxRetryAttempts: numberRetries)
                 }
             } catch {
                 userDef.set(true, forKey: userDefKey)
                 print(userDef.bool(forKey: userDefKey), "UserDef")
             }
         }
+        operationTaskChange = currentTask
     }
     
     public func removeTask(id: String, todoItem: TodoItem) {
@@ -82,7 +92,7 @@ class DataBase {
         }
         Task {
             do {
-                try await networkFetcher.removeItem(TodoItem: todoItem)
+                try await networkFetcher.removeItem(toDoItems: todoItem, maxRetryAttempts: numberRetries)
             } catch {
                 userDef.set(true, forKey: userDefKey)
                 print(userDef.bool(forKey: userDefKey), "UserDef")
@@ -104,21 +114,29 @@ class DataBase {
             try? self.cache.saveToJson(toFileWithID: fileName)
             userDefailts.set(true, forKey: "DirectoryExists")
         }
-        Task {
-            await self.loadFromServer()
-            await MainActor.run {
-                try? self.cache.loadFromJson(from: fileName)
-                toDoList = Array(self.cache.items.values)
-                toDoList.sort{$0.dateCreation > $1.dateCreation}
-                mainViewModelDelegate?.loadFromServer.value = true
-                mainViewModelDelegate?.numberDoneTasks.value = countDone()
+        if userDefailts.bool(forKey: userDefKey) == false {
+            Task {
+                await self.loadFromServer()
+                await MainActor.run {
+                    try? self.cache.loadFromJson(from: fileName)
+                    toDoList = Array(self.cache.items.values)
+                    toDoList.sort{$0.dateCreation > $1.dateCreation}
+                    mainViewModelDelegate?.loadFromServer.value = true
+                    mainViewModelDelegate?.numberDoneTasks.value = countDone()
+                }
             }
+        } else {
+            try? self.cache.loadFromJson(from: fileName)
+            toDoList = Array(self.cache.items.values)
+            toDoList.sort{$0.dateCreation > $1.dateCreation}
+            updateTasks()
         }
     }
     
     public func loadFromServer() async {
         do {
-            let networkingList = try await networkFetcher.getAllItems()
+            let networkingList = try await networkFetcher.getAllItems(maxRetryAttempts: numberRetries)
+            print(networkingList.map{$0.done})
             for toDoItem in networkingList {
                 cache.add(item: toDoItem)
             }
@@ -137,3 +155,4 @@ enum SortedBy: String {
 }
 
 let fileName = "myTasksJson"
+let numberRetries = 5

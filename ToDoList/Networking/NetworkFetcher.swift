@@ -10,10 +10,10 @@ import Foundation
 protocol NetworkService {
     func getAllItems() async throws -> [TodoItem]
     func updateItems(toDoItems: [TodoItem]) async throws -> [TodoItem]
-    func getItem(TodoItem: TodoItem) async throws
-    func removeItem(TodoItem: TodoItem) async throws
-    func changeItem(TodoItem: TodoItem) async throws
-    func addItem(TodoItem: TodoItem) async throws
+    func getItem(todoItem: TodoItem) async throws
+    func removeItem(todoItem: TodoItem) async throws
+    func changeItem(todoItem: TodoItem) async throws
+    func addItem(todoItem: TodoItem) async throws
 }
 
 final class NetworkFetcher: NetworkService {
@@ -37,14 +37,28 @@ final class NetworkFetcher: NetworkService {
     func getAllItems() async throws -> [TodoItem] {
         let url = try RequestProcessor.makeURL()
         let (data, _) = try await RequestProcessor.performRequest(with: url)
+        
         let networkListToDoItems = try decoder.decode(ListToDoItems.self, from: data)
         revision = networkListToDoItems.revision
         return networkListToDoItems.list.map { TodoItem.convert(from: $0) }
     }
     
-    @discardableResult
+    func getAllItems(maxRetryAttempts: Int) async throws -> [TodoItem] {
+        print("getAllItems(with retry: Int)")
+        var retryCount = 0
+        while retryCount < maxRetryAttempts {
+            do {
+                return try await getAllItems()
+            } catch {
+                try await Task.sleep(nanoseconds: getDelay(with: retryCount))
+                retryCount += 1
+            }
+        }
+        throw Errors.noResponse
+    }
+    
     func updateItems(toDoItems: [TodoItem]) async throws -> [TodoItem] {
-        print("requestUpdateItems")
+        print("updateItems")
         let url = try RequestProcessor.makeURL()
         let listToDoItems = ListToDoItems(list: toDoItems.map{$0.networkItem})
         let httpBody = try encoder.encode(listToDoItems)
@@ -54,35 +68,78 @@ final class NetworkFetcher: NetworkService {
         return toDoItemNetwork.list.map{TodoItem.convert(from: $0)}
     }
     
-    func getItem(TodoItem: TodoItem) async throws {
-        print("requestGetItem")
-        let url = try RequestProcessor.makeURL(from: TodoItem.id)
+    @discardableResult
+    func updateItems(toDoItems: [TodoItem], maxRetryAttempts: Int) async throws -> [TodoItem] {
+        print("updateItems(with retry: Int)")
+        var retryCount = 0
+        while retryCount < maxRetryAttempts {
+            do {
+                return try await updateItems(toDoItems: toDoItems)
+            } catch {
+                try await Task.sleep(nanoseconds: getDelay(with: retryCount))
+                retryCount += 1
+            }
+        }
+        throw Errors.noResponse
+    }
+    
+    func getItem(todoItem: TodoItem) async throws {
+        print("getItem")
+        let url = try RequestProcessor.makeURL(from: todoItem.id)
         let (data, _) = try await RequestProcessor.performRequest(with: url)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: data)
         print(toDoItemNetwork)
         revision = toDoItemNetwork.revision
     }
     
-    func removeItem(TodoItem: TodoItem) async throws {
-        print("requestRemoveItem")
-        let url = try RequestProcessor.makeURL(from: TodoItem.id)
+    func removeItem(todoItem: TodoItem) async throws {
+        print("removeItem")
+        let url = try RequestProcessor.makeURL(from: todoItem.id)
         let (data, _) = try await RequestProcessor.performRequest(with: url, method: .delete, revision: revision)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: data)
         print(toDoItemNetwork)
         revision = toDoItemNetwork.revision
     }
     
-    func changeItem(TodoItem: TodoItem) async throws {
-        let url = try RequestProcessor.makeURL(from: TodoItem.id)
-        let elementToDoItem = ElementToDoItem(element: TodoItem.networkItem)
+    func removeItem(toDoItems: TodoItem, maxRetryAttempts: Int) async throws {
+        print("removeItem(with retry: Int)")
+        var retryCount = 0
+        while retryCount < maxRetryAttempts {
+            do {
+                return try await removeItem(todoItem: toDoItems)
+            } catch {
+                try await Task.sleep(nanoseconds: getDelay(with: retryCount))
+                retryCount += 1
+            }
+        }
+        throw Errors.noResponse
+    }
+    
+    func changeItem(todoItem: TodoItem) async throws {
+        let url = try RequestProcessor.makeURL(from: todoItem.id)
+        let elementToDoItem = ElementToDoItem(element: todoItem.networkItem)
         let httpBody = try encoder.encode(elementToDoItem)
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .put, revision: revision, httpBody: httpBody)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: responseData)
         revision = toDoItemNetwork.revision
     }
     
-    func addItem(TodoItem: TodoItem) async throws {
-        let elementToDoItem = ElementToDoItem(element: TodoItem.networkItem)
+    func changeItem(toDoItems: TodoItem, maxRetryAttempts: Int) async throws {
+        print("changeItem(with retry: Int)")
+        var retryCount = 0
+        while retryCount < maxRetryAttempts {
+            do {
+                return try await changeItem(todoItem: toDoItems)
+            } catch {
+                try await Task.sleep(nanoseconds: getDelay(with: retryCount))
+                retryCount += 1
+            }
+        }
+        throw Errors.noResponse
+    }
+    
+    func addItem(todoItem: TodoItem) async throws {
+        let elementToDoItem = ElementToDoItem(element: todoItem.networkItem)
         let url = try RequestProcessor.makeURL()
         let httpBody = try encoder.encode(elementToDoItem)
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .post, revision: revision, httpBody: httpBody)
@@ -90,5 +147,21 @@ final class NetworkFetcher: NetworkService {
         revision = toDoItemNetwork.revision
     }
     
+    func addItem(toDoItems: TodoItem, maxRetryAttempts: Int) async throws {
+        print("addItem(with retry: Int)")
+        var retryCount = 0
+        while retryCount < maxRetryAttempts {
+            do {
+                return try await addItem(todoItem: toDoItems)
+            } catch {
+                try await Task.sleep(nanoseconds: getDelay(with: retryCount))
+                retryCount += 1
+            }
+        }
+        throw Errors.noResponse
+    }
     
+    enum Errors: Error {
+        case noResponse
+    }
 }
