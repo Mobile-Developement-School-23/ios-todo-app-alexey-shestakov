@@ -21,7 +21,6 @@ class DataBase {
     
     var typeSorting: SortedBy = .none
     
-    var operationTaskChange: Task<Void, Never>?
     var operationTaskUpdate: Task<Void, Never>?
     
     init() {
@@ -41,43 +40,49 @@ class DataBase {
     }
     
     private func updateTasks() {
-        Task {
+        if let operationTaskUpdate,
+           !operationTaskUpdate.isCancelled {
+            operationTaskUpdate.cancel()
+        }
+
+        let currentTask = Task { @MainActor in
             do {
                 let cachArray = Array(self.cache.items.values)
+                mainViewModelDelegate?.changeRequestStatus(operation: .update, statusCompleted: false)
                 try await networkFetcher.updateItems(toDoItems: cachArray, maxRetryAttempts: numberRetries)
+                mainViewModelDelegate?.changeRequestStatus(operation: .update, statusCompleted: true)
                 userDef.set(false, forKey: userDefKey)
             } catch {
                 print(error)
             }
         }
+        operationTaskUpdate = currentTask
     }
     
     public func saveTask(item: TodoItem, new: Bool) {
         cache.add(item: item)
         countDone()
         try? self.cache.saveToJson(toFileWithID: fileName)
-        print((cache.items.values).map{$0.done})
         guard userDef.bool(forKey: userDefKey) != true else {
             updateTasks()
             return
         }
-        if let operationTaskChange,
-           !operationTaskChange.isCancelled {
-            operationTaskChange.cancel()
-        }
-        let currentTask = Task {
+        Task { @MainActor in
             do {
                 if new {
+                    mainViewModelDelegate?.changeRequestStatus(operation: .change, statusCompleted: false)
                     try await networkFetcher.addItem(toDoItems: item, maxRetryAttempts: numberRetries)
+                    mainViewModelDelegate?.changeRequestStatus(operation: .change, statusCompleted: true)
                 } else {
+                    mainViewModelDelegate?.changeRequestStatus(operation: .change, statusCompleted: false)
                     try await networkFetcher.changeItem(toDoItems: item, maxRetryAttempts: numberRetries)
+                    mainViewModelDelegate?.changeRequestStatus(operation: .change, statusCompleted: true)
                 }
             } catch {
                 userDef.set(true, forKey: userDefKey)
-                print(userDef.bool(forKey: userDefKey), "UserDef")
+                print("UserDefaults changed in:", userDef.bool(forKey: userDefKey))
             }
         }
-        operationTaskChange = currentTask
     }
     
     public func removeTask(id: String, todoItem: TodoItem) {
@@ -88,12 +93,12 @@ class DataBase {
             updateTasks()
             return
         }
-        Task {
+        Task { @MainActor in
             do {
                 try await networkFetcher.removeItem(toDoItems: todoItem, maxRetryAttempts: numberRetries)
             } catch {
                 userDef.set(true, forKey: userDefKey)
-                print(userDef.bool(forKey: userDefKey), "UserDef")
+                print("UserDefaults changed in:", userDef.bool(forKey: userDefKey))
             }
         }
     }
@@ -113,22 +118,22 @@ class DataBase {
             userDefailts.set(true, forKey: "DirectoryExists")
         }
         if userDefailts.bool(forKey: userDefKey) == false {
-            Task {
+            Task { @MainActor in
                 await self.loadFromServer()
-                await MainActor.run {
-                    try? self.cache.loadFromJson(from: fileName)
-                    toDoList = Array(self.cache.items.values)
-                    toDoList.sort{$0.dateCreation > $1.dateCreation}
-                    mainViewModelDelegate?.loadFromServer.value = true
-                    mainViewModelDelegate?.numberDoneTasks.value = countDone()
-                }
+                tasksExtractor()
+                mainViewModelDelegate?.changeRequestStatus(operation: .load, statusCompleted: true)
+                mainViewModelDelegate?.numberDoneTasks.value = countDone()
             }
         } else {
-            try? self.cache.loadFromJson(from: fileName)
-            toDoList = Array(self.cache.items.values)
-            toDoList.sort{$0.dateCreation > $1.dateCreation}
+            tasksExtractor()
             updateTasks()
         }
+    }
+    
+    private func tasksExtractor() {
+        try? self.cache.loadFromJson(from: fileName)
+        toDoList = Array(self.cache.items.values)
+        toDoList.sort{$0.dateCreation > $1.dateCreation}
     }
     
     public func loadFromServer() async {
@@ -141,10 +146,17 @@ class DataBase {
             try? cache.saveToJson(toFileWithID: fileName)
         } catch {
             userDef.set(true, forKey: userDefKey)
+            print("UserDefaults changed in:", userDef.bool(forKey: userDefKey))
         }
     }
 }
-
+enum TypeNetworkOperation {
+    case change
+    case load
+    case add
+    case delete
+    case update
+}
 
 enum SortedBy: String {
     case onlyNotDone = "Несделанные"
@@ -153,4 +165,4 @@ enum SortedBy: String {
 }
 
 let fileName = "myTasksJson"
-let numberRetries = 5
+let numberRetries = 3

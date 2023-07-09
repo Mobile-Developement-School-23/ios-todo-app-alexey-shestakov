@@ -10,14 +10,24 @@ import Foundation
 class MainViewModel: TableViewViewModelType {
     
     private let model: DataBase
-    
-    var loadFromServer: Observable<Bool> = Observable(false)
+
+    var networkRequestCompleted: ObservableWithParam<Bool> = ObservableWithParam((false, reload: false))
     
     var numberDoneTasks: Observable<Int?> = Observable(nil)
     
     init() {
         self.model = DataBase()
         model.mainViewModelDelegate = self
+    }
+    
+    func changeRequestStatus(operation: TypeNetworkOperation, statusCompleted: Bool) {
+        ///Для сетевых запросов делать reload надо только для .load
+        switch operation{
+        case .update, .change, .add, .delete:
+            networkRequestCompleted.value = (statusCompleted, reload: false)
+        case .load:
+            networkRequestCompleted.value = (statusCompleted, reload: true)
+        }
     }
     
     func returnModel() -> DataBase {

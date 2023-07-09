@@ -45,19 +45,6 @@ class TableView: UITableView {
         self.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    ///Эту функцию надо вызвать когда делегат уже установлен
-    public func bindViewModel() {
-        mainViewControllerDelegate?.getViewModel()?.loadFromServer.bind(listener: { [unowned self] bool in
-            if bool {
-                self.reloadData()
-                mainViewControllerDelegate?.processProgressIndicator(false)
-                mainViewControllerDelegate?.getViewModel()?.loadFromServer.value = false
-            }
-        })
-    }
-
-    
-    
     lazy var setUpHeader = { [weak self] in
         guard let self, let viewModel = self.mainViewControllerDelegate?.getViewModel() else {return}
         let cgRect = CGRect(x: 0, y: 0,

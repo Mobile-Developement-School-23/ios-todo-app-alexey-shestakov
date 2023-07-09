@@ -9,7 +9,7 @@ import Foundation
 
 protocol TableViewViewModelType {
     var numberDoneTasks: Observable<Int?> {get set}
-    var loadFromServer: Observable<Bool> {get set}
+    var networkRequestCompleted: ObservableWithParam<Bool> {get set}
     func sortItems(typeSorting: SortedBy)
     func returnModel() -> DataBase
     func numberOfRows() -> Int

@@ -20,6 +20,7 @@ final class NetworkFetcher: NetworkService {
     private var revision: Int?
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
+    let lock = NSLock()
     
     private func getDelay(with retryCount: Int) -> UInt64 {
         let maxDelay = 120.0
@@ -39,7 +40,9 @@ final class NetworkFetcher: NetworkService {
         let (data, _) = try await RequestProcessor.performRequest(with: url)
         
         let networkListToDoItems = try decoder.decode(ListToDoItems.self, from: data)
-        revision = networkListToDoItems.revision
+        lock.withLock {
+            revision = networkListToDoItems.revision
+        }
         return networkListToDoItems.list.map { TodoItem.convert(from: $0) }
     }
     
@@ -64,7 +67,7 @@ final class NetworkFetcher: NetworkService {
         let httpBody = try encoder.encode(listToDoItems)
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .patch, revision: revision ?? 0, httpBody: httpBody)
         let toDoItemNetwork = try decoder.decode(ListToDoItems.self, from: responseData)
-        await MainActor.run {
+        lock.withLock {
             revision = toDoItemNetwork.revision
         }
     }
@@ -99,7 +102,7 @@ final class NetworkFetcher: NetworkService {
         let (data, _) = try await RequestProcessor.performRequest(with: url, method: .delete, revision: revision)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: data)
         print(toDoItemNetwork)
-        await MainActor.run {
+        lock.withLock {
             revision = toDoItemNetwork.revision
         }
     }
@@ -124,7 +127,7 @@ final class NetworkFetcher: NetworkService {
         let httpBody = try encoder.encode(elementToDoItem)
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .put, revision: revision, httpBody: httpBody)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: responseData)
-        await MainActor.run {
+        lock.withLock {
             revision = toDoItemNetwork.revision
         }
     }
@@ -149,7 +152,7 @@ final class NetworkFetcher: NetworkService {
         let httpBody = try encoder.encode(elementToDoItem)
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .post, revision: revision, httpBody: httpBody)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: responseData)
-        await MainActor.run {
+        lock.withLock {
             revision = toDoItemNetwork.revision
         }
     }

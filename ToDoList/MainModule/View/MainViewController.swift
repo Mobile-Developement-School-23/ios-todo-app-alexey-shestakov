@@ -29,14 +29,6 @@ class MainViewController: UIViewController {
         return button
     }()
     
-    private let activityIndocator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .large)
-        indicator.hidesWhenStopped = true
-        indicator.color = .systemBlue
-        indicator.translatesAutoresizingMaskIntoConstraints = false
-        return indicator
-    }()
-    
     convenience init(viewModel: TableViewViewModelType? = nil) {
         self.init()
         self.mainViewModel = viewModel
@@ -50,8 +42,6 @@ class MainViewController: UIViewController {
         setUpDelegates()
         tableView.setUpHeader()
         tableView.setUpFooter()
-        
-        processProgressIndicator(true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -65,20 +55,10 @@ class MainViewController: UIViewController {
         view.backgroundColor = .specialBackground
         view.addSubview(tableView)
         view.addSubview(faButton)
-        view.addSubview(activityIndocator)
-    }
-    
-    public func processProgressIndicator(_ continueIndicator: Bool) {
-        if continueIndicator {
-            activityIndocator.startAnimating()
-        } else {
-            activityIndocator.stopAnimating()
-        }
     }
     
     private func setUpDelegates() {
         tableView.mainViewControllerDelegate = self
-        tableView.bindViewModel()
     }
     
     @objc func addTask() {
@@ -130,9 +110,6 @@ extension MainViewController {
             faButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             faButton.heightAnchor.constraint(equalToConstant: 50),
             faButton.widthAnchor.constraint(equalToConstant: 50),
-            
-            activityIndocator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndocator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
     }
 }
