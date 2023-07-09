@@ -9,7 +9,7 @@ import Foundation
 
 protocol NetworkService {
     func getAllItems() async throws -> [TodoItem]
-    func updateItems(toDoItems: [TodoItem]) async throws -> [TodoItem]
+    func updateItems(toDoItems: [TodoItem]) async throws
     func getItem(todoItem: TodoItem) async throws
     func removeItem(todoItem: TodoItem) async throws
     func changeItem(todoItem: TodoItem) async throws
@@ -57,24 +57,25 @@ final class NetworkFetcher: NetworkService {
         throw Errors.noResponse
     }
     
-    func updateItems(toDoItems: [TodoItem]) async throws -> [TodoItem] {
+    func updateItems(toDoItems: [TodoItem]) async throws {
         print("updateItems")
         let url = try RequestProcessor.makeURL()
         let listToDoItems = ListToDoItems(list: toDoItems.map{$0.networkItem})
         let httpBody = try encoder.encode(listToDoItems)
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .patch, revision: revision ?? 0, httpBody: httpBody)
         let toDoItemNetwork = try decoder.decode(ListToDoItems.self, from: responseData)
-        revision = toDoItemNetwork.revision
-        return toDoItemNetwork.list.map{TodoItem.convert(from: $0)}
+        await MainActor.run {
+            revision = toDoItemNetwork.revision
+        }
     }
     
-    @discardableResult
-    func updateItems(toDoItems: [TodoItem], maxRetryAttempts: Int) async throws -> [TodoItem] {
+    func updateItems(toDoItems: [TodoItem], maxRetryAttempts: Int) async throws {
         print("updateItems(with retry: Int)")
         var retryCount = 0
         while retryCount < maxRetryAttempts {
             do {
-                return try await updateItems(toDoItems: toDoItems)
+                try await updateItems(toDoItems: toDoItems)
+                return
             } catch {
                 try await Task.sleep(nanoseconds: getDelay(with: retryCount))
                 retryCount += 1
@@ -98,7 +99,9 @@ final class NetworkFetcher: NetworkService {
         let (data, _) = try await RequestProcessor.performRequest(with: url, method: .delete, revision: revision)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: data)
         print(toDoItemNetwork)
-        revision = toDoItemNetwork.revision
+        await MainActor.run {
+            revision = toDoItemNetwork.revision
+        }
     }
     
     func removeItem(toDoItems: TodoItem, maxRetryAttempts: Int) async throws {
@@ -121,7 +124,9 @@ final class NetworkFetcher: NetworkService {
         let httpBody = try encoder.encode(elementToDoItem)
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .put, revision: revision, httpBody: httpBody)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: responseData)
-        revision = toDoItemNetwork.revision
+        await MainActor.run {
+            revision = toDoItemNetwork.revision
+        }
     }
     
     func changeItem(toDoItems: TodoItem, maxRetryAttempts: Int) async throws {
@@ -144,7 +149,9 @@ final class NetworkFetcher: NetworkService {
         let httpBody = try encoder.encode(elementToDoItem)
         let (responseData, _) = try await RequestProcessor.performRequest(with: url, method: .post, revision: revision, httpBody: httpBody)
         let toDoItemNetwork = try decoder.decode(ElementToDoItem.self, from: responseData)
-        revision = toDoItemNetwork.revision
+        await MainActor.run {
+            revision = toDoItemNetwork.revision
+        }
     }
     
     func addItem(toDoItems: TodoItem, maxRetryAttempts: Int) async throws {

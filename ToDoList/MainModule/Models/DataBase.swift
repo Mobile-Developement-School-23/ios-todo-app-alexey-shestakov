@@ -45,9 +45,6 @@ class DataBase {
             do {
                 let cachArray = Array(self.cache.items.values)
                 try await networkFetcher.updateItems(toDoItems: cachArray, maxRetryAttempts: numberRetries)
-                await MainActor.run {
-                    mainViewModelDelegate?.loadFromServer.value = true
-                }
                 userDef.set(false, forKey: userDefKey)
             } catch {
                 print(error)
@@ -59,6 +56,7 @@ class DataBase {
         cache.add(item: item)
         countDone()
         try? self.cache.saveToJson(toFileWithID: fileName)
+        print((cache.items.values).map{$0.done})
         guard userDef.bool(forKey: userDefKey) != true else {
             updateTasks()
             return

@@ -89,6 +89,7 @@ class TableViewCell: UITableViewCell {
         setUpViews()
         setUpConstraints()
         addGesture()
+        prepareForReuse()
     }
     
     required init?(coder: NSCoder) {
@@ -189,13 +190,6 @@ class TableViewCell: UITableViewCell {
     @objc func tap() {
         setChecked()
         viewModel?.makeDoneUndone()
-        if checkmark.image == UIImage(named: "checkmark_done") {
-            UIView.animate(withDuration: 0.15, animations: {
-                self.checkmark.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
-            }) { (bool) in
-                self.checkmark.transform = .identity
-            }
-        }
         tableViewDelegate?.reloadData()
     }
 }
