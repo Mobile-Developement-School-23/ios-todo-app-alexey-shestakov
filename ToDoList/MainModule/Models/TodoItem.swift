@@ -10,7 +10,7 @@ struct TodoItem {
     let dateCreation: Date
     let dateChanging: Date?
     
-    init(id: String = UUID().uuidString, text: String, importance: Importance, deadline: Date? = nil, done: Bool = false, dateCreation: Date, dateChanging: Date? = nil) {
+    init(id: String = UUID().uuidString, text: String, importance: Importance, deadline: Date? = nil, done: Bool = false, dateCreation: Date, dateChanging: Date? = Date()) {
         self.id = id
         self.text = text
         self.importance = importance
@@ -86,7 +86,7 @@ extension TodoItem {
         let components = csv.components(separatedBy: ",")
         
         guard components.count == 7 else {
-            return nil // Всего 7 полей, которые должны существовать(пусть даже и пустые)
+            return nil /// Всего 7 полей, которые должны существовать(пусть даже и пустые)
         }
         
         let id = components[0]
@@ -130,5 +130,70 @@ extension TodoItem {
         csvString += dateChanging != nil ? "\(dateChanging!.timeIntervalSince1970)" : ""
         
         return csvString
+    }
+}
+
+extension TodoItem {
+    static func convert(from networkToDoItem: NetworkTodoItem) -> TodoItem {
+        var importance = Importance.normal
+        switch networkToDoItem.importance {
+            case "low":
+                importance = .unimportant
+            case "basic":
+                importance = .normal
+            case "important":
+                importance = .important
+            default:
+                break
+        }
+        var deadline: Date?
+        if let deadlineTimeInterval = networkToDoItem.deadline {
+            deadline = Date(timeIntervalSinceReferenceDate: Double(deadlineTimeInterval))
+        }
+        var changed: Date?
+        if let changedTimeInterval = networkToDoItem.changedAt {
+            changed = Date(timeIntervalSinceReferenceDate: Double(changedTimeInterval))
+        }
+        let created = Date(timeIntervalSinceReferenceDate: Double(networkToDoItem.createdAt))
+        
+        let toDoItem = TodoItem(
+            id: networkToDoItem.id,
+            text: networkToDoItem.text,
+            importance: importance,
+            deadline: deadline,
+            done: networkToDoItem.done,
+            dateCreation: created,
+            dateChanging: changed)
+        return toDoItem
+    }
+    
+    var networkItem: NetworkTodoItem {
+        var importance = ""
+        switch self.importance {
+        case .unimportant:
+            importance = "low"
+        case .normal:
+            importance = "basic"
+        case .important:
+            importance = "important"
+        }
+        var deadline: Int?
+        if let deadlineTimeInterval = self.deadline?.timeIntervalSinceReferenceDate {
+            deadline = Int(deadlineTimeInterval)
+        }
+        var changed: Int?
+        if let changedTimeInterval = self.dateChanging?.timeIntervalSinceReferenceDate{
+            changed = Int(changedTimeInterval)
+        }
+        let created = Int(self.dateCreation.timeIntervalSinceReferenceDate)
+        
+        let networkItem = NetworkTodoItem(id: id,
+                                text: text,
+                                importance: importance,
+                                deadline: deadline,
+                                done: done,
+                                createdAt: created,
+                                changedAt: changed)
+        return networkItem
     }
 }

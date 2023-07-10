@@ -9,10 +9,10 @@ import Foundation
 
 protocol TableViewViewModelType {
     var numberDoneTasks: Observable<Int?> {get set}
+    var networkRequestCompleted: ObservableWithParam<Bool> {get set}
     func sortItems(typeSorting: SortedBy)
     func returnModel() -> DataBase
     func numberOfRows() -> Int
     func cellViewModel(forIndexPath indexPath: IndexPath) -> TableViewCellViewType?
     func viewModelForSelectedRow(forIndexPath indexPath: IndexPath) -> DetailViewModelType?
-    func deleteItem(index: Int)
 }

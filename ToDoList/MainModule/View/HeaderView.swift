@@ -31,6 +31,14 @@ class HeaderView: UIView {
         return label
     }()
     
+    private let activityIndocator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.hidesWhenStopped = true
+        indicator.color = .systemBlue
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setUpViews()
@@ -48,6 +56,7 @@ class HeaderView: UIView {
         backgroundColor = .specialBackground
         addSubview(button)
         addSubview(label)
+        addSubview(activityIndocator)
     }
     
     public func configure() {
@@ -58,6 +67,26 @@ class HeaderView: UIView {
             guard let number else {return}
             label.text = "Выполнено - \(number)"
         })
+        
+        
+        mainViewModel?.networkRequestCompleted.bind(listener: { [unowned self] (completed, makeReload) in
+            if completed {
+                if makeReload {
+                    tableViewDelegate?.reloadData()
+                }
+                processProgressIndicator(false)
+            } else {
+                processProgressIndicator(true)
+            }
+        })
+    }
+    
+    private func processProgressIndicator(_ continueIndicator: Bool) {
+        if continueIndicator {
+            activityIndocator.startAnimating()
+        } else {
+            activityIndocator.stopAnimating()
+        }
     }
     
     
@@ -65,13 +94,15 @@ class HeaderView: UIView {
         NSLayoutConstraint.activate([
             label.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
             label.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
-            label.widthAnchor.constraint(equalToConstant: 200),
             label.heightAnchor.constraint(equalToConstant: 30),
             
             button.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16),
             button.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
             button.widthAnchor.constraint(lessThanOrEqualToConstant: 200),
-            button.heightAnchor.constraint(equalToConstant: 30)
+            button.heightAnchor.constraint(equalToConstant: 30),
+            
+            activityIndocator.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 10),
+            activityIndocator.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
     }
     
