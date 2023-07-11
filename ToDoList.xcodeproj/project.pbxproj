@@ -43,6 +43,9 @@
 		C574B61D2A563C0300F96C25 /* NetworkTodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C574B61C2A563C0300F96C25 /* NetworkTodoItem.swift */; };
 		C574B61F2A56415E00F96C25 /* NetworkFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C574B61E2A56415E00F96C25 /* NetworkFetcher.swift */; };
 		C574B6212A5641B400F96C25 /* RequestProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C574B6202A5641B400F96C25 /* RequestProcessor.swift */; };
+		C58CD2B12A5D76B800C5CC92 /* DataBase.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C58CD2AF2A5D76B800C5CC92 /* DataBase.xcdatamodeld */; };
+		C58CD2B42A5D782600C5CC92 /* Entity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58CD2B22A5D782600C5CC92 /* Entity+CoreDataClass.swift */; };
+		C58CD2B52A5D782600C5CC92 /* Entity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58CD2B32A5D782600C5CC92 /* Entity+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +106,9 @@
 		C574B61C2A563C0300F96C25 /* NetworkTodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTodoItem.swift; sourceTree = "<group>"; };
 		C574B61E2A56415E00F96C25 /* NetworkFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkFetcher.swift; sourceTree = "<group>"; };
 		C574B6202A5641B400F96C25 /* RequestProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestProcessor.swift; sourceTree = "<group>"; };
+		C58CD2B02A5D76B800C5CC92 /* DataBase.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataBase.xcdatamodel; sourceTree = "<group>"; };
+		C58CD2B22A5D782600C5CC92 /* Entity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Entity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		C58CD2B32A5D782600C5CC92 /* Entity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Entity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +170,7 @@
 				C54AFC8D2A3D164600FFD18E /* Application */,
 				C54AFC8C2A3D163500FFD18E /* MainModule */,
 				C54C2AF32A3F1C3000D30949 /* EditingModule */,
+				C58CD2AE2A5D769D00C5CC92 /* Persistence */,
 				C574B61B2A563BE900F96C25 /* Networking */,
 				C51CA1422A4E69AC008F2C63 /* Animators */,
 				C54AFC902A3D167000FFD18E /* Extensions */,
@@ -344,6 +351,16 @@
 			path = Networking;
 			sourceTree = "<group>";
 		};
+		C58CD2AE2A5D769D00C5CC92 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				C58CD2B22A5D782600C5CC92 /* Entity+CoreDataClass.swift */,
+				C58CD2B32A5D782600C5CC92 /* Entity+CoreDataProperties.swift */,
+				C58CD2AF2A5D76B800C5CC92 /* DataBase.xcdatamodeld */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -476,9 +493,11 @@
 			files = (
 				C51CA1412A4E5A57008F2C63 /* Observable.swift in Sources */,
 				C574B61F2A56415E00F96C25 /* NetworkFetcher.swift in Sources */,
+				C58CD2B12A5D76B800C5CC92 /* DataBase.xcdatamodeld in Sources */,
 				C54C2B102A3F7AEC00D30949 /* DetailViewModel.swift in Sources */,
 				C574B61D2A563C0300F96C25 /* NetworkTodoItem.swift in Sources */,
 				C50C071C2A5A67D00020C255 /* ObservableWithParam.swift in Sources */,
+				C58CD2B52A5D782600C5CC92 /* Entity+CoreDataProperties.swift in Sources */,
 				C574B61A2A56353D00F96C25 /* URLSession+extensions.swift in Sources */,
 				C54AFC602A3D160F00FFD18E /* MainViewController.swift in Sources */,
 				C51CA1262A44C92E008F2C63 /* UIStackView+extensions.swift in Sources */,
@@ -493,6 +512,7 @@
 				C51CA13F2A4D02E9008F2C63 /* FooterView.swift in Sources */,
 				C54AFC5E2A3D160F00FFD18E /* SceneDelegate.swift in Sources */,
 				C54C2AF52A3F1C6A00D30949 /* TableView.swift in Sources */,
+				C58CD2B42A5D782600C5CC92 /* Entity+CoreDataClass.swift in Sources */,
 				C51CA1242A44BA52008F2C63 /* ImportanceDeadlineView.swift in Sources */,
 				C54C2B022A3F762B00D30949 /* TableViewCellViewType.swift in Sources */,
 				C54C2B0C2A3F7A5D00D30949 /* MainViewModel.swift in Sources */,
@@ -838,6 +858,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		C58CD2AF2A5D76B800C5CC92 /* DataBase.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				C58CD2B02A5D76B800C5CC92 /* DataBase.xcdatamodel */,
+			);
+			currentVersion = C58CD2B02A5D76B800C5CC92 /* DataBase.xcdatamodel */;
+			path = DataBase.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = C54AFC502A3D160F00FFD18E /* Project object */;
 }
