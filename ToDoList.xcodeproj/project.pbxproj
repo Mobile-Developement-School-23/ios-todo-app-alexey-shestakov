@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		C50C071C2A5A67D00020C255 /* ObservableWithParam.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50C071B2A5A67D00020C255 /* ObservableWithParam.swift */; };
+		C50C07462A5C3CE40020C255 /* TodoItemPersiatence+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50C07442A5C3CE40020C255 /* TodoItemPersiatence+CoreDataClass.swift */; };
+		C50C07472A5C3CE40020C255 /* TodoItemPersiatence+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50C07452A5C3CE40020C255 /* TodoItemPersiatence+CoreDataProperties.swift */; };
+		C50C07492A5C3DCB0020C255 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50C07482A5C3DCB0020C255 /* StorageManager.swift */; };
 		C51CA1222A44B130008F2C63 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1212A44B130008F2C63 /* UIColor+Extensions.swift */; };
 		C51CA1242A44BA52008F2C63 /* ImportanceDeadlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1232A44BA52008F2C63 /* ImportanceDeadlineView.swift */; };
 		C51CA1262A44C92E008F2C63 /* UIStackView+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51CA1252A44C92E008F2C63 /* UIStackView+extensions.swift */; };
@@ -67,6 +70,9 @@
 
 /* Begin PBXFileReference section */
 		C50C071B2A5A67D00020C255 /* ObservableWithParam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableWithParam.swift; sourceTree = "<group>"; };
+		C50C07442A5C3CE40020C255 /* TodoItemPersiatence+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodoItemPersiatence+CoreDataClass.swift"; sourceTree = "<group>"; };
+		C50C07452A5C3CE40020C255 /* TodoItemPersiatence+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodoItemPersiatence+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		C50C07482A5C3DCB0020C255 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		C51CA1212A44B130008F2C63 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		C51CA1232A44BA52008F2C63 /* ImportanceDeadlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportanceDeadlineView.swift; sourceTree = "<group>"; };
 		C51CA1252A44C92E008F2C63 /* UIStackView+extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+extensions.swift"; sourceTree = "<group>"; };
@@ -136,6 +142,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C50C071D2A5C315F0020C255 /* Persistance */ = {
+			isa = PBXGroup;
+			children = (
+				C50C07442A5C3CE40020C255 /* TodoItemPersiatence+CoreDataClass.swift */,
+				C50C07452A5C3CE40020C255 /* TodoItemPersiatence+CoreDataProperties.swift */,
+				C50C07482A5C3DCB0020C255 /* StorageManager.swift */,
+			);
+			path = Persistance;
+			sourceTree = "<group>";
+		};
 		C51CA1422A4E69AC008F2C63 /* Animators */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				C54AFC8D2A3D164600FFD18E /* Application */,
+				C50C071D2A5C315F0020C255 /* Persistance */,
 				C54AFC8C2A3D163500FFD18E /* MainModule */,
 				C54C2AF32A3F1C3000D30949 /* EditingModule */,
 				C58CD2AE2A5D769D00C5CC92 /* Persistence */,
@@ -506,8 +523,11 @@
 				C54C2B0A2A3F793A00D30949 /* DataBase.swift in Sources */,
 				C51CA1352A4B5A35008F2C63 /* UIView+extensions.swift in Sources */,
 				C54C2AF72A3F1CA200D30949 /* TableViewCell.swift in Sources */,
+				C50C07462A5C3CE40020C255 /* TodoItemPersiatence+CoreDataClass.swift in Sources */,
 				C54C2B0E2A3F7ADD00D30949 /* TableViewCellViewModel.swift in Sources */,
 				C54AFC5C2A3D160F00FFD18E /* AppDelegate.swift in Sources */,
+				C50C07472A5C3CE40020C255 /* TodoItemPersiatence+CoreDataProperties.swift in Sources */,
+				C50C07492A5C3DCB0020C255 /* StorageManager.swift in Sources */,
 				C54C2B192A409D2200D30949 /* DetailViewController.swift in Sources */,
 				C51CA13F2A4D02E9008F2C63 /* FooterView.swift in Sources */,
 				C54AFC5E2A3D160F00FFD18E /* SceneDelegate.swift in Sources */,
