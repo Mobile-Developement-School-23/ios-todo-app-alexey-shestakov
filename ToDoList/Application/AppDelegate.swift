@@ -31,22 +31,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if let error {
                 print(error.localizedDescription)
             } else {
-                print("DB url: ", description.url?.absoluteString)
+                print("CoreData file: ", description.url?.absoluteString ?? "")
             }
         }
         return container
     }()
-    
-    
-    // Контекст - это слепок данных, с которыми мы работаем. Но данные потом надо сохранить этой функцией
-    func saveContext() {
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                fatalError(error.localizedDescription)
-            }
-        }
-    }
 }

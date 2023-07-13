@@ -9,23 +9,26 @@
 import Foundation
 import CoreData
 
+@objc(TodoItemPersiatence)
+public class TodoItemPersiatence: NSManagedObject {
+
+}
 
 extension TodoItemPersiatence {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<TodoItemPersiatence> {
         return NSFetchRequest<TodoItemPersiatence>(entityName: "TodoItemPersiatence")
     }
-
-
+    
     @NSManaged public var id: String
     @NSManaged public var text: String
-    @NSManaged public var importanceValue: String
-    var importance: Importance {
+    @NSManaged private var importanceValue: String
+    public var importance: Importance {
         get {
             Importance(rawValue: importanceValue) ?? .normal
         }
         set {
-            Importance(rawValue: newValue.rawValue) ?? <#default value#>
+            importanceValue = newValue.rawValue
         }
     }
     @NSManaged public var deadline: Date?

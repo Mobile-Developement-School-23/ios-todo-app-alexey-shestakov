@@ -1,15 +1,16 @@
 //
-//  DataBase.swift
+//  DataBase(CoreData).swift
 //  ToDoList
 //
-//  Created by Alexey Shestakov on 18.06.2023.
+//  Created by Alexey Shestakov on 13.07.2023.
 //
 
 import Foundation
+import UIKit
 
 class DataBase {
-    
-    private let cache = FileCache()
+    private let cache = DataCache(context:
+                                    (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext )
     private let networkFetcher = NetworkFetcher()
     
     private let userDef = UserDefaults.standard
@@ -53,6 +54,7 @@ class DataBase {
                 mainViewModelDelegate?.changeRequestStatus(operation: .update, statusCompleted: true)
                 userDef.set(false, forKey: userDefKey)
             } catch {
+                mainViewModelDelegate?.changeRequestStatus(operation: .update, statusCompleted: true)
                 print(error)
             }
         }
@@ -60,9 +62,12 @@ class DataBase {
     }
     
     public func saveTask(item: TodoItem, new: Bool) {
-        cache.add(item: item)
+        if new {
+            cache.insert(item: item)
+        } else {
+            cache.update(item: item)
+        }
         countDone()
-        try? self.cache.saveToJson(toFileWithID: fileName)
         guard userDef.bool(forKey: userDefKey) != true else {
             updateTasks()
             return
@@ -80,20 +85,20 @@ class DataBase {
                 }
             } catch {
                 userDef.set(true, forKey: userDefKey)
+                mainViewModelDelegate?.changeRequestStatus(operation: .change, statusCompleted: true)
                 print("UserDefaults changed in:", userDef.bool(forKey: userDefKey))
             }
         }
     }
     
     public func removeTask(id: String, todoItem: TodoItem) {
-        cache.remove(id: id)
+        cache.delete(id: id)
         countDone()
-        try? self.cache.saveToJson(toFileWithID: fileName)
         guard userDef.bool(forKey: userDefKey) != true else {
             updateTasks()
             return
         }
-        Task { @MainActor in
+        Task {
             do {
                 try await networkFetcher.removeItem(toDoItems: todoItem, maxRetryAttempts: numberRetries)
             } catch {
@@ -111,12 +116,8 @@ class DataBase {
     }
     
     private func checkDirectoryAndLoad() {
-        /// Если это первый запуск прилы, то создаем дирректорию и получаем данные с сервера
         let userDefailts = UserDefaults.standard
-        if userDefailts.bool(forKey: "DirectoryExists") == false {
-            try? self.cache.saveToJson(toFileWithID: fileName)
-            userDefailts.set(true, forKey: "DirectoryExists")
-        }
+        cache.loadFromCoreData()
         if userDefailts.bool(forKey: userDefKey) == false {
             Task { @MainActor in
                 await self.loadFromServer()
@@ -131,7 +132,6 @@ class DataBase {
     }
     
     private func tasksExtractor() {
-        try? self.cache.loadFromJson(from: fileName)
         toDoList = Array(self.cache.items.values)
         toDoList.sort{$0.dateCreation > $1.dateCreation}
     }
@@ -139,11 +139,13 @@ class DataBase {
     public func loadFromServer() async {
         do {
             let networkingList = try await networkFetcher.getAllItems(maxRetryAttempts: numberRetries)
-            print(networkingList.map{$0.done})
+            print(networkingList.map{$0.text})
             for toDoItem in networkingList {
-                cache.add(item: toDoItem)
+                if cache.items[toDoItem.id] == nil {
+                    cache.insert(item: toDoItem)
+                }
             }
-            try? cache.saveToJson(toFileWithID: fileName)
+            print(cache.items.count)
         } catch {
             userDef.set(true, forKey: userDefKey)
             print("UserDefaults changed in:", userDef.bool(forKey: userDefKey))
