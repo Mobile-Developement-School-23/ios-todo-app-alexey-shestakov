@@ -1,9 +1,10 @@
 
 import Foundation
+import CoreData
 
-struct TodoItem {
+public struct TodoItem {
     let id: String
-    let text: String
+    var text: String
     let importance: Importance
     let deadline: Date?
     let done: Bool
@@ -21,7 +22,7 @@ struct TodoItem {
     }
 }
 
-enum Importance: String {
+public enum Importance: String {
     case unimportant = "неважная"
     case normal = "обычная"
     case important = "важная"
@@ -195,5 +196,35 @@ extension TodoItem {
                                 createdAt: created,
                                 changedAt: changed)
         return networkItem
+    }
+}
+
+//MARK: - Persistence(SQL)
+
+
+//MARK: - Persistence(CoreData)
+extension TodoItem {
+    static func convertFromPersistent(_ todoItemPersiatence: TodoItemPersiatence) -> TodoItem {
+        let toDoItem = TodoItem(
+            id: todoItemPersiatence.id,
+            text: todoItemPersiatence.text,
+            importance: todoItemPersiatence.importance,
+            deadline: todoItemPersiatence.deadline,
+            done: todoItemPersiatence.done,
+            dateCreation: todoItemPersiatence.dateCreation,
+            dateChanging: todoItemPersiatence.dateChanging)
+        return toDoItem
+    }
+    
+    static func convertToPersistent(todoItem: TodoItem, entity: NSEntityDescription, context: NSManagedObjectContext) -> TodoItemPersiatence {
+        let todoItemPersistence = TodoItemPersiatence(entity: entity, insertInto: context)
+        todoItemPersistence.id = todoItem.id
+        todoItemPersistence.text = todoItem.text
+        todoItemPersistence.importance = todoItem.importance
+        todoItemPersistence.done = todoItem.done
+        todoItemPersistence.deadline = todoItem.deadline
+        todoItemPersistence.dateCreation = todoItem.dateCreation
+        todoItemPersistence.dateChanging = todoItem.dateChanging
+        return todoItemPersistence
     }
 }
