@@ -147,9 +147,8 @@
 		C50C071D2A5C315F0020C255 /* Persistance */ = {
 			isa = PBXGroup;
 			children = (
-				C58CD2BA2A5EDA4500C5CC92 /* CoreData.xcdatamodeld */,
-				C50C07452A5C3CE40020C255 /* TodoItemPersiatence+CoreDataProperties.swift */,
-				C50C07482A5C3DCB0020C255 /* DataCache.swift */,
+				C58CD2BF2A6073A900C5CC92 /* CoreData */,
+				C58CD2C02A6073BB00C5CC92 /* SQL */,
 			);
 			path = Persistance;
 			sourceTree = "<group>";
@@ -379,6 +378,23 @@
 				C58CD2AF2A5D76B800C5CC92 /* DataBase.xcdatamodeld */,
 			);
 			path = Persistence;
+			sourceTree = "<group>";
+		};
+		C58CD2BF2A6073A900C5CC92 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				C58CD2BA2A5EDA4500C5CC92 /* CoreData.xcdatamodeld */,
+				C50C07452A5C3CE40020C255 /* TodoItemPersiatence+CoreDataProperties.swift */,
+				C50C07482A5C3DCB0020C255 /* DataCache.swift */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		C58CD2C02A6073BB00C5CC92 /* SQL */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = SQL;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class DataBase {
+final class DataBase {
     private let cache = DataCache(context:
                                     (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext )
     private let networkFetcher = NetworkFetcher()
@@ -139,13 +139,12 @@ class DataBase {
     public func loadFromServer() async {
         do {
             let networkingList = try await networkFetcher.getAllItems(maxRetryAttempts: numberRetries)
-            print(networkingList.map{$0.text})
+            //print(networkingList.map{$0.text})
             for toDoItem in networkingList {
                 if cache.items[toDoItem.id] == nil {
                     cache.insert(item: toDoItem)
                 }
             }
-            print(cache.items.count)
         } catch {
             userDef.set(true, forKey: userDefKey)
             print("UserDefaults changed in:", userDef.bool(forKey: userDefKey))

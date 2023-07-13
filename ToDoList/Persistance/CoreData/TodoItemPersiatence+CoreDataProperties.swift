@@ -10,9 +10,7 @@ import Foundation
 import CoreData
 
 @objc(TodoItemPersiatence)
-public class TodoItemPersiatence: NSManagedObject {
-
-}
+public class TodoItemPersiatence: NSManagedObject {}
 
 extension TodoItemPersiatence {
 
@@ -35,7 +33,6 @@ extension TodoItemPersiatence {
     @NSManaged public var done: Bool
     @NSManaged public var dateCreation: Date
     @NSManaged public var dateChanging: Date?
-
 }
 
 extension TodoItemPersiatence : Identifiable {
