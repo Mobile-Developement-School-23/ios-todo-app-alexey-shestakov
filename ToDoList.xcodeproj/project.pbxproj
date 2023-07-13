@@ -50,6 +50,7 @@
 		C58CD2B52A5D782600C5CC92 /* Entity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58CD2B32A5D782600C5CC92 /* Entity+CoreDataProperties.swift */; };
 		C58CD2BC2A5EDA4500C5CC92 /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C58CD2BA2A5EDA4500C5CC92 /* CoreData.xcdatamodeld */; };
 		C58CD2BE2A5F55E500C5CC92 /* DataBase(CoreData).swift in Sources */ = {isa = PBXBuildFile; fileRef = C58CD2BD2A5F55E500C5CC92 /* DataBase(CoreData).swift */; };
+		C58CD2C32A607A3F00C5CC92 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = C58CD2C22A607A3F00C5CC92 /* SQLite */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,6 +125,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C58CD2C32A607A3F00C5CC92 /* SQLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +415,9 @@
 			dependencies = (
 			);
 			name = ToDoList;
+			packageProductDependencies = (
+				C58CD2C22A607A3F00C5CC92 /* SQLite */,
+			);
 			productName = ToDoList;
 			productReference = C54AFC582A3D160F00FFD18E /* ToDoList.app */;
 			productType = "com.apple.product-type.application";
@@ -485,6 +490,9 @@
 				Base,
 			);
 			mainGroup = C54AFC4F2A3D160F00FFD18E;
+			packageReferences = (
+				C58CD2C12A607A3F00C5CC92 /* XCRemoteSwiftPackageReference "SQLite" */,
+			);
 			productRefGroup = C54AFC592A3D160F00FFD18E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -898,6 +906,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C58CD2C12A607A3F00C5CC92 /* XCRemoteSwiftPackageReference "SQLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C58CD2C22A607A3F00C5CC92 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C58CD2C12A607A3F00C5CC92 /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		C58CD2AF2A5D76B800C5CC92 /* DataBase.xcdatamodeld */ = {
