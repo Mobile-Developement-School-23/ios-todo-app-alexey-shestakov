@@ -22,7 +22,7 @@ public final class DataCache: NSObject {
     
     
     /// LOAD
-    public func loadFromCoreData() {
+    public func load() {
         loadTodoItems().forEach{items[$0.id] = $0}
     }
     
@@ -77,7 +77,7 @@ public final class DataCache: NSObject {
     }
     
     
-    ///DELETE
+    /// DELETE
     @discardableResult
     public func delete(id: String) -> TodoItem? {
         let deleted = items[id]

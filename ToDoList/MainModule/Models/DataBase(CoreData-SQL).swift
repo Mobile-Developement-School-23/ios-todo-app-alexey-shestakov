@@ -9,8 +9,9 @@ import Foundation
 import UIKit
 
 final class DataBase {
-    private let cache = DataCache(context:
-                                    (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext )
+//    private let cache = DataCache(context:
+//                                    (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext )
+    private let cache = DataCacheSQL()
     private let networkFetcher = NetworkFetcher()
     
     private let userDef = UserDefaults.standard
@@ -84,6 +85,7 @@ final class DataBase {
                     mainViewModelDelegate?.changeRequestStatus(operation: .change, statusCompleted: true)
                 }
             } catch {
+                print(error)
                 userDef.set(true, forKey: userDefKey)
                 mainViewModelDelegate?.changeRequestStatus(operation: .change, statusCompleted: true)
                 print("UserDefaults changed in:", userDef.bool(forKey: userDefKey))
@@ -117,7 +119,10 @@ final class DataBase {
     
     private func checkDirectoryAndLoad() {
         let userDefailts = UserDefaults.standard
-        cache.loadFromCoreData()
+        cache.load()
+        
+        print(cache.items.values)
+        
         if userDefailts.bool(forKey: userDefKey) == false {
             Task { @MainActor in
                 await self.loadFromServer()
