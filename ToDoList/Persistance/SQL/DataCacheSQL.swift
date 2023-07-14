@@ -33,7 +33,6 @@ final class DataCacheSQL {
             db = try Connection("\(path)/TodoItems.sqlite3")
             todoItems = Table("TodoItems")
             
-            // create instances of each column
             id = Expression<String>("id")
             text = Expression<String>("text")
             importance = Expression<String>("importance")
@@ -43,7 +42,6 @@ final class DataCacheSQL {
             dateChanging = Expression<Int?>("dateChanging")
             
             if (!UserDefaults.standard.bool(forKey: "is_db_created")) {
-                // if not, then create the table
                 try db.run(todoItems.create { table in
                     table.column(id, primaryKey: true)
                     table.column(text)
@@ -53,13 +51,14 @@ final class DataCacheSQL {
                     table.column(dateCreation)
                     table.column(dateChanging)
                 })
-                // set the value to true, so it will not attempt to create the table again
                 UserDefaults.standard.set(true, forKey: "is_db_created")
             }
         } catch {
             print(error.localizedDescription)
         }
     }
+    
+    
     
     /// INSERT
     public func insert(item: TodoItem) {
@@ -96,6 +95,8 @@ final class DataCacheSQL {
             print(error.localizedDescription)
         }
     }
+    
+    
     
     /// LOAD
     public func load() {
@@ -142,7 +143,6 @@ final class DataCacheSQL {
     
     
     
-    
     /// UPDATE
     public func update(item: TodoItem) {
         items[item.id] = item
@@ -160,7 +160,7 @@ final class DataCacheSQL {
         let dateCreationInt = Int(newTodoItem.dateCreation.timeIntervalSince1970)
         
         var dateChangingInt: Int?
-        if let dateChangingDate = newTodoItem.deadline {
+        if let dateChangingDate = newTodoItem.dateChanging {
             dateChangingInt = Int(dateChangingDate.timeIntervalSince1970)
         }
         
