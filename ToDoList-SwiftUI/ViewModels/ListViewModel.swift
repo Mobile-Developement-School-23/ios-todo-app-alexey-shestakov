@@ -46,7 +46,7 @@ class ListViewModel: ObservableObject {
     }
     
     func countDone() -> Int {
-        let array = items.filter {$0.done == true}
+        let array = Array(self.cache.items.values).filter {$0.done == true}
         return array.count
     }
     
