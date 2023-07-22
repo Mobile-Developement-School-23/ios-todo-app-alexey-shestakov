@@ -10,11 +10,25 @@ import Foundation
 class ListViewModel: ObservableObject {
     private let cache = FileCache()
     
-    @Published var items: [TodoItem] = []
+    @Published var _items: [TodoItem] = []
     
     var typeSorting: SortedBy = .none
     
-    var tempItems: [TodoItem] = []
+    var items: [TodoItem] {
+        get {
+            var array: [TodoItem]
+            switch typeSorting {
+            case .onlyNotDone:
+                array = Array(self.cache.items.values).filter {$0.done != true}
+            case .none:
+                array = Array(self.cache.items.values)
+            }
+            return array.sorted{$0.dateCreation > $1.dateCreation}
+        }
+        set {
+            _items = newValue
+        }
+    }
     
     let itemsKey: String = "items_list"
     
@@ -23,19 +37,12 @@ class ListViewModel: ObservableObject {
     }
     
     func filterArray(typeSorting: SortedBy) {
-        switch typeSorting {
-        case .onlyNotDone:
-            items = Array(self.cache.items.values).filter {$0.done != true}
-        case .none:
-            items = Array(self.cache.items.values)
-        }
-        items.sort{$0.dateCreation > $1.dateCreation}
+        self.typeSorting = typeSorting
     }
     
     func getItems() {
         try? cache.loadFromJson(from: fileName)
         items = Array(cache.items.values)
-        items.sort{$0.dateCreation > $1.dateCreation}
     }
     
     func countDone() -> Int {
