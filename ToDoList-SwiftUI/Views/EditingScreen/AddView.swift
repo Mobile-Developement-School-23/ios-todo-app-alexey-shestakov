@@ -12,6 +12,7 @@ struct AddView: View {
     // MARK: PROPERTIES
     
     @Binding var todoItem: TodoItem?
+    @Binding var index: Int?
     
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var listViewModel: ListViewModel
@@ -69,11 +70,7 @@ struct AddView: View {
                         .cornerRadius(16)
                         .font(.system(size: 17))
                         .onChange(of: text, perform: { _ in
-                            guard text != nil else {
-                                disableButtons = true
-                                return
-                            }
-                            disableButtons = false
+                            activateButton()
                         })
                         .onTapGesture {
                             hideKeyboard()
@@ -93,11 +90,7 @@ struct AddView: View {
                             .cornerRadius(9)
                             
                             .onChange(of: selectedSegment) { newValue in
-                                guard text != nil else {
-                                    disableButtons = true
-                                    return
-                                }
-                                disableButtons = false
+                                activateButton()
                             }
                         }
                         Divider()
@@ -124,11 +117,7 @@ struct AddView: View {
                                         deadlineShown = false
                                         deadline = nil
                                     }
-                                    guard text != nil else {
-                                        disableButtons = true
-                                        return
-                                    }
-                                    disableButtons = false
+                                    activateButton()
                                 }
                         }
                         
@@ -142,11 +131,7 @@ struct AddView: View {
                             .datePickerStyle(.graphical)
                             .environment(\.locale, Locale.init(identifier: "ru"))
                             .onChange(of: deadline) { newValue in
-                                guard text != nil else {
-                                    disableButtons = true
-                                    return
-                                }
-                                disableButtons = false
+                                activateButton()
                             }
                         }
                     }
@@ -155,6 +140,7 @@ struct AddView: View {
                     .cornerRadius(16)
                     
                     Button {
+                        listViewModel.deleteItem(todoItem: todoItem, index: index)
                         presentationMode.wrappedValue.dismiss()
                     } label: {
                         Text("Удалить")
@@ -189,6 +175,14 @@ struct AddView: View {
         .onAppear{self.configureProperties()}
     }
     
+    private func activateButton() {
+        guard text != nil else {
+            disableButtons = true
+            return
+        }
+        disableButtons = false
+    }
+    
     private func provideDeadline() -> Date {
         if let deadline {
             return deadline
@@ -221,7 +215,6 @@ struct AddView: View {
                                 dateCreation: todoItem.dateCreation,
                                 dateChanging: Date().localDate())
             listViewModel.updateItem(todoItem: item)
-            print(item)
         }
         presentationMode.wrappedValue.dismiss()
     }

@@ -48,7 +48,8 @@ class ListViewModel: ObservableObject {
         return array.count
     }
     
-    func deleteItem(todoItem: TodoItem, index: Int) {
+    func deleteItem(todoItem: TodoItem?, index: Int?) {
+        guard let todoItem, let index else {return}
         items.remove(at: index)
         cache.remove(id: todoItem.id)
         try? cache.saveToJson(toFileWithID: fileName)

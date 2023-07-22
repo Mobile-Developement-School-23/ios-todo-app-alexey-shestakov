@@ -12,6 +12,7 @@ struct ListView: View {
     @EnvironmentObject var listViewModel: ListViewModel
     
     @State private var itemSelected: TodoItem? = nil
+    @State private var indexSelected: Int? = nil
     
     @State private var isPresented = false
     
@@ -25,6 +26,7 @@ struct ListView: View {
                         ListRowView(item: item)
                             .onTapGesture {
                                 itemSelected = listViewModel.items[index]
+                                indexSelected = index
                                 isPresented = true
                             }
                             .swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -93,7 +95,7 @@ struct ListView: View {
             }
         }
         .sheet(isPresented: $isPresented, content: {
-            AddView(todoItem: $itemSelected)
+            AddView(todoItem: $itemSelected, index: $indexSelected)
         })
     }
 }
