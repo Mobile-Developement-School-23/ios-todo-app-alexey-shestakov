@@ -124,6 +124,11 @@ struct AddView: View {
                                         deadlineShown = false
                                         deadline = nil
                                     }
+                                    guard text != nil else {
+                                        disableButtons = true
+                                        return
+                                    }
+                                    disableButtons = false
                                 }
                         }
                         
