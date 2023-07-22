@@ -9,9 +9,9 @@ import Foundation
 import UIKit
 
 final class DataBase {
-//    private let cache = DataCache(context:
-//                                    (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext )
-    private let cache = DataCacheSQL()
+    private let cache = DataCache(context:
+                                    (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext )
+//    private let cache = DataCacheSQL()
     private let networkFetcher = NetworkFetcher()
     
     private let userDef = UserDefaults.standard
